@@ -20,11 +20,17 @@ Actually i needed a tool to
 The directories are:
 
 ./              - a empty dir with wsc in it or wsc in path called from inside a empty dir is the basic dir for wsc.
+
 ./bak/          - with the 'r' command, the source in this dir will be restored to ./wine-test
+
 ./build/wine32  - build dir for the 32bit wine
+
 ./build/wine64  - build dir for the 64bit wine, contents of both is deleted on a new build
+
 ./wine-staging  - contains the wine staging patches, download with '9' or copy in from local source
+
 ./wine-test     - this is Workdir, in this dir the sources get modified, patched, restored
+
 ./wine-vanilla  - contains the wine vanilla source, can be used to copy to workdir for a fresh source in there ('k') or 
                   build directly from there with 'v'
 
