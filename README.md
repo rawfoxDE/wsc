@@ -4,6 +4,30 @@ wine source control
 This bash script will download the needed files and is able to compile a wow64 build of Vanilla Wine.
 It also can rebase the wine vanilla source to the actual wine staging version, inject all staging patches and built it.
 
+Concept:
+
+The incredible modularity of the wine sources give a lot of options to reach a good working wine core that can serve all the certain prefixes for your best gaming experience with Windows games on Linux, using wine.
+Out of experience, a wow64 build of wine has the most flexibility when it comes to handle the different modes like 32bit, 64bit, DX7,8,9,10,11, WinXP to Windows10 so i've been exclusivly focusing that build type, Windows on Windows64.
+
+Actually i needed a tool to
+1. download vanilla and staging
+2. build and install me a vanilla-wine
+3. build and install me a wine-staging
+4. build a modified local source
+5. patch the source with own patches
+6. prepare a source and inject staging
+
+The directories are:
+
+./              - a empty dir with wsc in it or wsc in path called from inside a empty dir is the basic dir for wsc.
+./bak/          - with the 'r' command, the source in this dir will be restored to ./wine-test
+./build/wine32  - build dir for the 32bit wine
+./build/wine64  - build dir for the 64bit wine, contents of both is deleted on a new build
+./wine-staging  - contains the wine staging patches, download with '9' or copy in from local source
+./wine-test     - this is Workdir, in this dir the sources get modified, patched, restored
+./wine-vanilla  - contains the wine vanilla source, can be used to copy to workdir for a fresh source in there ('k') or 
+                  build directly from there with 'v'
+
 Usage:
 
 Very first look into the script!
