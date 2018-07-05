@@ -18,7 +18,7 @@ fBLU="\033[34m"
 fRED="\e[1;7;33m"
  RES="\033[0m"
  YLW="\033[1;42m"
- VER="v0.1-02032018"
+ VER="v0.1-05072018"
 
 # Functions -------------------------------------------------
 
@@ -33,25 +33,30 @@ _DONE()
 # either after upgrading the vanilla wine source or the wine-staging source
 _BUILD()
 {
-    echo -en $YLW "Building Wine                                         $RES\n"
-    mkdir -p ./build/wine-32
-    mkdir -p ./build/wine-64
-    
+    echo -en $YLW "Building Wine                                          $RES\n"
+
     rm -rf ./build/wine-32/* # removing the old install directories
-    rm -rf ./build/wine-64/* # a better solution soon as we dont need to compile the whole thing
+    rm -rf ./build/wine-64/* # a better solution soon
+
+    mkdir -p --mode=0777 ./build/wine-32
+    mkdir -p --mode=0777 ./build/wine-64
 
     # compile 64bit version first in order to get wow64
-    # importand is the --enable-win64 flag
+    # important is the --enable-win64 flag
+
     cd ./build/wine-64
-    echo -en "$YLW configure 64bit part, please wait                     $RES\n"
+    echo -en "$BLU configure 64bit part, please wait                      $RES\n"
     ../../wine-test/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong"  --enable-win64 > ../configure64.log
-    echo -en "$fRED compiling 64bit part now, please wait ...            $RES\n"
+    echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
     make -j6 > ../compile64.log # overheat protection for amd8150 in summer :)
+
+    # compile the 32bit version now
     # the flag --with-wine64=/path includes the former 64bit build
+
     cd ../wine-32
-    echo -en "$YLW configure 32bit part, please wait                     $RES\n"
+    echo -en "$BLU configure 32bit part, please wait                      $RES\n"
     PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../wine-test/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 --without-gssapi --without-krb5 > ../configure32.log
-    echo -en "$fRED compiling 32bit part now, please wait  ...           $RES\n"
+    echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
     make -j6 > ../compile32.log
     cd ../../
     _DONE
@@ -60,27 +65,26 @@ _BUILD()
 
 _VBUILD()
 {
-    echo -en $YLW "Building Vanilla Wine                               $RES\n"
-    mkdir -p ./build/wine-32
-    mkdir -p ./build/wine-64
-    
+    echo -en $YLW "Building Vanilla Wine                                     $RES\n"
+
     rm -rf ./build/wine-32/* # removing the old install directories
     rm -rf ./build/wine-64/* # a better solution soon as we dont need to compile the whole thing
 
-    # compile 64bit version first in order to get wow64
-    # importand is the --enable-win64 flag
+    mkdir -p --mode=0777 ./build/wine-32
+    mkdir -p --mode=0777 ./build/wine-64
+
     cd ./build/wine-64
-    echo -en "$YLW configure 64bit part, please wait                     $RES\n"
-    ../../wine-vanilla/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong"  --enable-win64 > ../configure64.log
-    echo -en "$fRED compiling 64bit part now, please wait ...            $RES\n"
+    echo -en "$BLU configure 64bit part, please wait                     $RES\n"
+    ../../wine-vanilla/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
+    echo -en "$GRN compiling 64bit part now, please wait ...             $RES\n"
     make -j6 > ../compile64.log  # overheat protection for amd8150 in summer :)
 
-    # the flag --with-wine64=/path includes the former 64bit build
     cd ../wine-32
-    echo -en "$YLW configure 32bit part, please wait                     $RES\n"
-    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../wine-vanilla/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 --without-gssapi --without-krb5 > ../configure32.log
-    echo -en "$fRED compiling 32bit part now, please wait  ...           $RES\n"
+    echo -en "$BLU configure 32bit part, please wait                     $RES\n"
+    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../wine-vanilla/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64  --without-gssapi --without-krb5 > ../configure32.log
+    echo -en "$GRN compiling 32bit part now, please wait  ...            $RES\n"
     make -j6 > ../compile32.log
+
     cd ../../
     _DONE
 }
@@ -108,22 +112,22 @@ do
 
 # menu selection
 echo -en     $BLU "WINE SOURCE CONTROL $VER by rawfox            $RES\n"
-echo -en "    $GRN   $WineVer   $RES 
+echo -en "    $GRN   $WineVer   $RES
 
 $RED 1 $RES - Check WORKDIR        $GRN 3 $RES - Check Wine Vanilla
 $RED 2 $RES - Check Wine Staging   $RED 4 $RES - Check installed Wine version
 
 $RED 5 $RES - INJECT STAGING       $BLU p $RES - Apply my Patches
 $RED 6 $RES - COMPILE WORKDIR      $RED i $RES - INSTALL
-$GRN v $RES - COMPILE VANILLA         
+$GRN v $RES - COMPILE VANILLA
 
-$RED a $RES - Get current wine-staging SHA1 
+$RED a $RES - Get current wine-staging SHA1
 $RED b $RES - Rebase wine source to the wine-staging Hash
 $RED c $RES - Stash changes and reset source to vanilla wine
 
-$BLU k $RES - Restore Vanilla to workdir      
-$BLU r $RES - Restore Backup  to Workdir      
-                                
+$BLU k $RES - Restore Vanilla to workdir
+$BLU r $RES - Restore Backup  to Workdir
+
 $RED 9 $RES - Get a new Wine Staging source
 $GRN 0 $RES - Get a new Vanilla Wine source   $RED q $RES - Quit
 
@@ -275,7 +279,9 @@ case $X in
     clear
     echo -en $fRED "Restore Workdir from Wine Backup  ...               $RES \n" 
     rm -rf ./wine-test
-    cp -rf ./bak ./wine-test
+    cp -rf ./bak/wine ./wine-test
+    rm -rf ./wine-staging
+    cp -rf ./bak/wine-staging ./wine-staging
     
 ;;
 
