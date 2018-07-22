@@ -16,9 +16,10 @@
  GRN="\033[1;43m"
 fBLU="\033[34m"
 fRED="\e[1;7;33m"
- RES="\033[0m"
  YLW="\033[1;42m"
- VER="v0.1-05072018"
+ 
+ RES="\033[0m"
+ VER="v0.1-17072018"
 
 # Functions -------------------------------------------------
 
@@ -55,7 +56,7 @@ _BUILD()
 
     cd ../wine-32
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../wine-test/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 --without-gssapi --without-krb5 > ../configure32.log
+    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../wine-test/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
     make -j6 > ../compile32.log
     cd ../../
@@ -65,7 +66,7 @@ _BUILD()
 
 _VBUILD()
 {
-    echo -en $YLW "Building Vanilla Wine                                     $RES\n"
+    echo -en "$GRN Building Vanilla Wine                                  $RES\n"
 
     rm -rf ./build/wine-32/* # removing the old install directories
     rm -rf ./build/wine-64/* # a better solution soon as we dont need to compile the whole thing
@@ -74,15 +75,15 @@ _VBUILD()
     mkdir -p --mode=0777 ./build/wine-64
 
     cd ./build/wine-64
-    echo -en "$BLU configure 64bit part, please wait                     $RES\n"
+    echo -en "$BLU configure 64bit part, please wait                      $RES\n"
     ../../wine-vanilla/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
-    echo -en "$GRN compiling 64bit part now, please wait ...             $RES\n"
+    echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
     make -j6 > ../compile64.log  # overheat protection for amd8150 in summer :)
 
     cd ../wine-32
-    echo -en "$BLU configure 32bit part, please wait                     $RES\n"
-    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../wine-vanilla/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64  --without-gssapi --without-krb5 > ../configure32.log
-    echo -en "$GRN compiling 32bit part now, please wait  ...            $RES\n"
+    echo -en "$BLU configure 32bit part, please wait                      $RES\n"
+    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../wine-vanilla/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64  > ../configure32.log
+    echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
     make -j6 > ../compile32.log
 
     cd ../../
@@ -94,10 +95,11 @@ _VBUILD()
 # it will just do a make install on both builds, the 32bit and the 64bit
 _INSTALL()
 {
+    echo -en "$BLU Installing wine, please wait                          $RES\n"
     cd ./build/wine-32
-    sudo make install
+    sudo make install > ../install32.log
     cd ../wine-64
-    sudo make install
+    sudo make install > ../install64.log
     cd ../../
 
 }
@@ -112,7 +114,7 @@ do
 
 # menu selection
 echo -en     $BLU "WINE SOURCE CONTROL $VER by rawfox            $RES\n"
-echo -en "    $GRN   $WineVer   $RES
+echo -en "      $GRN   $WineVer   $RES
 
 $RED 1 $RES - Check WORKDIR        $GRN 3 $RES - Check Wine Vanilla
 $RED 2 $RES - Check Wine Staging   $RED 4 $RES - Check installed Wine version
@@ -139,7 +141,7 @@ case $X in
 
 [1]* )
     clear
-    echo -en $BLU "checking Workdir ..                                $RES\n"
+    echo -en $BLU "checking Workdir ..                                    $RES\n"
     cd ./wine-test
     echo -en $fRED " "
     git pull
@@ -150,8 +152,8 @@ case $X in
 
 [2]* )
     clear
-    echo -en $BLU "checking Wine Staging update ..                    $RES\n"
-    cd ./wine-staging
+    echo -en $BLU "checking Wine Staging update ..                        $RES\n"
+    cd ./wine-staging 
     echo -en $fRED " "
     git pull
     echo -en $RES
@@ -161,7 +163,7 @@ case $X in
 
 [3]* )
     clear
-    echo -en $BLU "checking Vanilla Wine updates ..                   $RES\n"
+    echo -en $BLU "checking Vanilla Wine updates ..                       $RES\n"
     cd ./wine-vanilla
     echo -en $fRED " "
     git pull
@@ -173,8 +175,8 @@ case $X in
 
 [4]* )
     clear
-    echo -en $BLU "check installed wine version ...                   $RES\n"
-    echo -en $fRED " "
+    echo -en $BLU "check installed wine version ...                       $RES\n"
+    echo -en $GRN " "
     wine --version
     echo -en $RES
     
@@ -182,7 +184,7 @@ case $X in
 
 [5]* )
     clear
-    echo -en $RED "prepareing source and injecting --all patches !!!  $RES\n"
+    echo -en $RED "prepareing source and injecting --all patches !!!      $RES\n"
     cd ./wine-test/
     ln -s "../wine-staging/patches"
     ./patches/patchinstall.sh --all
@@ -227,7 +229,7 @@ case $X in
 
 [a]* )
     clear
-    echo -en $YLW "Getting SHA1 Hash                                  $RES\n\n"
+    echo -en $YLW "Getting SHA1 Hash                                      $RES\n\n"
     myHash=$(./wine-staging/patches/patchinstall.sh --upstream-commit)
     echo -en $fRED 
     echo $myHash
@@ -237,10 +239,10 @@ case $X in
 
 [b]* )
     clear
-    echo -en $fRED "Reset wine source to wine staging SHA1             $RES \n\n"
+    echo -en $fRED "Reset wine source to wine staging SHA1                 $RES \n\n"
     cd ./wine-test
     git reset --hard $myHash
-    echo -en  $YLW "You can insert the wine-staging patches now        $RES \n\n"
+    echo -en  $YLW "You can insert the wine-staging patches now            $RES \n\n"
     cd ..
     
 ;;
@@ -258,7 +260,7 @@ case $X in
 
 [p]* )
     clear
-    echo -en $fRED "Patching Sources ...                                $RES \n" 
+    echo -en $fRED "Patching Sources ...                                  $RES \n" 
     cd ./wine-test
     patch -p1 < ../patches/gta5-patch/gta1.patch
     patch -p1 < ../patches/gta5-patch/gta2.patch
@@ -269,7 +271,7 @@ case $X in
 
 [k]* )
     clear
-    echo -en $fRED "Restore Workdir from Wine Vanilla ...               $RES \n" 
+    echo -en $fRED "Restore Workdir from Wine Vanilla ...                 $RES \n" 
     rm -rf ./wine-test
     cp -rf ./wine-vanilla ./wine-test
     
@@ -277,7 +279,7 @@ case $X in
 
 [r]* )
     clear
-    echo -en $fRED "Restore Workdir from Wine Backup  ...               $RES \n" 
+    echo -en $fRED "Restore Workdir from Wine Backup  ...                 $RES \n" 
     rm -rf ./wine-test
     cp -rf ./bak/wine ./wine-test
     rm -rf ./wine-staging
