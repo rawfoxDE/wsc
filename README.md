@@ -21,18 +21,17 @@ The directories are:
 
 ./              - a empty dir with wsc in it or wsc in path called from inside a empty dir is the basic dir for wsc.
 
-./bak/          - with the 'r' command, the source in this dir will be restored to ./wine-test
-
 ./build/wine32  - build dir for the 32bit wine
 
 ./build/wine64  - build dir for the 64bit wine, contents of both is deleted on a new build
 
 ./wine-staging  - contains the wine staging patches, download with '9' or copy in from local source
 
-./wine-test     - this is Workdir, in this dir the sources get modified, patched, restored
+./workdir       - this is Workdir, in this dir the sources get modified, patched, restored
 
-./wine-vanilla  - contains the wine vanilla source, can be used to copy to workdir for a fresh source in there ('k') or 
-                  build directly from there with 'v'
+./wine-vanilla  - contains the wine vanilla source, can be used to copy to workdir for a fresh source in there ('k') or build directly from there with 'v'
+
+./patches 	- a place for your patches, this will be reworked soon as you still have to enter the patchname in the wsc script
 
 Usage:
 
@@ -97,6 +96,16 @@ Get a new Vanilla source from the wine Github.
 This goes not into workdir, its going into Vanilla dir so you can build vanilla anytime.
 Workdir is the place for the modified/patched Vanilla build.
 
+r - Get a certain wine-release version
+--------------------------------------
+Lets you enter a wine release version of your choice, what is available in the main wine release repo.
+It will download and unpack to wine-vanilla and wine-staging dir's so to unite them, need to copy to workdir first (k).
+No need to tweak the wine source to the wine-staging source because its a release version.
+
+R - Reset the source to SHA1
+----------------------------
+Resets the source in ./workdir to a given hash tag.
+
 p - Apply my Patches
 --------------------
 Applies patches from ./patches dir to workdir.
@@ -123,6 +132,9 @@ After building, you have to install it (press 'i') and it will install to /usr/l
 If you want other install targets, just modify the script to your needs.
 
 To build wine-staging, you want rebase the vanilla sources to the actual wine staging version.
+
+k -> a -> b -> 5 -> 6 -> i
+
 (press 'k') to copy the Vanilla source to workdir.
 (press 'a') to get the actual wine-staging hash tag.
 (press 'b') to base/set the wine vanilla sources to the wine-staging hash version.
