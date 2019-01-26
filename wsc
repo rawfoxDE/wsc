@@ -19,7 +19,7 @@ fRED="\e[1;7;33m"
  YLW="\033[1;42m"
 
  RES="\033[0m"
- VER="v0.1-02112018"
+ VER="v0.1-26012019"
 
 # Functions -------------------------------------------------
 
@@ -172,6 +172,7 @@ _REBASE()
 #####################################################################################
 clear
 WineVer=$(wine --version)
+CUR_PATH=$(pwd)
 
 while [ "$X" != "q" ]
 do
@@ -179,8 +180,7 @@ do
 # menu selection
 echo -en     $BLU "WINE SOURCE CONTROL $VER by rawfox            $RES\n"
 echo -en "      $GRN   $WineVer   $RES
-
-$RED 1 $RES - Check WORKDIR        $GRN 3 $RES - Check Wine Vanilla
+$RED 1 $RES - Check WORKDIR        $RED 3 $RES - Check Wine Vanilla
 $RED 2 $RES - Check Wine Staging   $RED 4 $RES - Check installed Wine version
 
 $RED 5 $RES - INJECT STAGING       $BLU p $RES - Apply my Patches
@@ -198,7 +198,7 @@ $RED 9 $RES - Get a new Wine Staging source
 $GRN 0 $RES - Get a new Vanilla Wine source           $RED q $RES - Quit
 $RED r $RES - Get a specific Wine release version
 $RED R $RES - Rebase workdir source to SHA1
-
+      $GRN $CUR_PATH $RES
 $BLU ------------------------------------------------------ $RES
 $YLW ==> $RES  "
 
@@ -332,9 +332,12 @@ case $X in
 
 [p]* )
     clear
-    echo -en $fRED "Patching Sources ...                                  $RES \n" 
+    echo -en $fRED "Patching Sources ...                                   $RES \n" 
     cd ./workdir
-    patch -p1 < ../patches/*.patch
+    patch -p1 < ../patches/*1*.patch
+    patch -p1 < ../patches/*2*.patch
+    patch -p1 < ../patches/*3*.patch
+    patch -p1 < ../patches/*4*.patch
 
     cd ..
 
