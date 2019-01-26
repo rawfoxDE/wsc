@@ -180,7 +180,7 @@ do
 # menu selection
 echo -en     $BLU "WINE SOURCE CONTROL $VER by rawfox            $RES\n"
 echo -en "      $GRN   $WineVer   $RES
-$RED 1 $RES - Check WORKDIR        $RED 3 $RES - Check Wine Vanilla
+$RED 1 $RES - Help                 $RED 3 $RES - Check Wine Vanilla
 $RED 2 $RES - Check Wine Staging   $RED 4 $RES - Check installed Wine version
 
 $RED 5 $RES - INJECT STAGING       $BLU p $RES - Apply my Patches
@@ -207,11 +207,7 @@ case $X in
 
 [1]* )
     clear
-    echo -en $BLU "checking Workdir ..                                    $RES\n"
-    cd ./workdir
-    echo -en $fRED " "
-    git pull
-    echo -en $RES
+    less ./README.md
     cd ..
     
 ;;
