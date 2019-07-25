@@ -2,7 +2,7 @@
 
 #################################################################################
 #                                                                               #
-# Wine Source Control by rawfox@freenet.de                                      #
+# Wine Source Control by rawfoxDE@gmail.com                                     #
 #                                                                               #
 # This script should help you, getting the latest wine and wine-staging sources #
 # and compile them on your system.                                              #
@@ -19,9 +19,7 @@ fRED="\e[1;7;33m"
  YLW="\033[1;42m"
 
  RES="\033[0m"
- VER="v0.1-12062019"
- 
-# INSTALL_PREFIX="/usr/local/"
+ VER="v0.1-26072019"
 
 # Functions -------------------------------------------------
 
@@ -79,7 +77,7 @@ _PBUILD()
     mkdir -p --mode=0777 "$I"
     fi
 
-    echo -en $YLW "\nBuilding Wine                                          $RES\n"
+    echo -en $YLW "\nBuilding Wine                                        $RES\n"
 
     rm -rf ./build/wine-32/* # removing the old install directories
     rm -rf ./build/wine-64/* # a better solution soon
@@ -101,7 +99,7 @@ _PBUILD()
 
     cd ../wine-32
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 > ../configure32.log
+    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
     make -j6 > ../compile32.log
     cd ../../
@@ -253,14 +251,13 @@ case $X in
 
 ;;
 
-
 [4]* )
     clear
     echo -en $BLU "check installed wine version ...                       $RES\n"
     echo -en $GRN " "
     wine --version
     echo -en $RES
-    
+
 ;;
 
 [5]* )
@@ -315,7 +312,7 @@ case $X in
     echo -en $fRED 
     echo $myHash
     echo -en $RES "\n"
-    
+
 ;;
 
 [b]* )
@@ -325,7 +322,7 @@ case $X in
     git reset --hard $myHash
     echo -en  $YLW "You can insert the wine-staging patches now            $RES \n\n"
     cd ..
-    
+
 ;;
 
 [c]* )
@@ -337,7 +334,6 @@ case $X in
     cd ..
 
 ;;
-
 
 [p]* )
     clear
@@ -359,7 +355,7 @@ case $X in
 
 [k]* )
     clear
-    echo -en $fRED "Restore Workdir from Wine Vanilla ...                  $RES \n" 
+    echo -en $fRED "Restore Workdir from Wine Vanilla ...                  $RES \n"
     rm -rf ./workdir
     cp -rf ./wine-vanilla ./workdir
 
@@ -368,15 +364,13 @@ case $X in
 [P]* )
 
     _PBUILD
-    
-;;
 
+;;
 
 [R]* )
     _REBASE
 
 ;;
-
 
 esac
 
