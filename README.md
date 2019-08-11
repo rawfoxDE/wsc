@@ -38,11 +38,9 @@ Usage:
 Command overview:
 ==========================================================================================================
 
-1 - Check Workdir
+1 - Help
 -----------------
-Workdir is a workdirectory created to apply patches.
-The Vanilla source goes here by copy it with 'k', just cloning the Vanilla wine source
-Workdir is the place to patch wine, i.e. with the staging patchset.
+Has to be done yet ..
 
 2 - Check Wine Staging
 ----------------------
@@ -65,10 +63,6 @@ After that you need to get the current version from wine staging into a hashtag 
 -------------------
 Builds your patched or modified wine in workdir
 
-v - COMPILE VANILLA
--------------------
-Builds a vanilla wine from the vanilla sources
-
 a - Get current wine-staging SHA1
 ---------------------------------
 This command will get the hash tag from the current wine-staging version.
@@ -78,7 +72,7 @@ b - Rebase wine source to wine-staging Hash
 This will modify the sources in workdir to the current version of the wine-staging patchset.
 You need to do this in order to get the wine.staging patches to apply.
 
-c - Stash your changes and reset source to vanilla wine
+c - Stash your changes and reset WORKDIR to vanilla wine
 -------------------------------------------------------
 This will reset the workdir source back to the current vanilla version
 
@@ -111,6 +105,11 @@ p - Apply my Patches
 Applies patches from ./patches dir to workdir.
 For the case you need something special patched in :)
 
+P - use a custom install path
+-----------------------------
+Changes the installation path to a custom location within the users rights.
+It does not install as superuser.
+
 i - INSTALL
 -----------
 Install your build default to /usr/local/* .
@@ -127,9 +126,10 @@ Get a bash up, join your directory and call the script with ./wsc
 Start with getting new sources for vanilla-wine (press '0') and wine-staging (press '9').
 
 Building Vanilla:
-Wsc is focusing a workdir for a modified wine build, but can build a vanilla-wine as well (press 'v').
+Wsc is focusing a workdir for a modified wine build, but can build a vanilla-wine as well 
+(press 'k' to copy Vanilla wine to the workdir).
 After building, you have to install it (press 'i') and it will install to /usr/local/* - the default installation location.
-If you want other install targets, just modify the script to your needs.
+If you want other install targets within your user rights, just press 'P' and enter your path.
 
 To build wine-staging, you want rebase the vanilla sources to the actual wine staging version.
 
