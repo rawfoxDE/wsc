@@ -69,7 +69,7 @@ _PBUILD()
     clear
     echo -en "$BLU Change the wine Install Path ...                      $RES\n
 
-    $YLW Enter new Installation taget: $RES "
+    $YLW Enter new Installation taget: $RES"
 
     read I
     if [ $I = "q" ]; then _DONE
@@ -102,6 +102,13 @@ _PBUILD()
     ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
     make -j6 > ../compile32.log
+    cd ../../
+
+    echo -en "$BLU Installing wine, please wait                           $RES\n"
+    cd ./build/wine-32
+    make install > ../install32.log
+    cd ../wine-64
+    make install > ../install64.log
     cd ../../
     _DONE
 
