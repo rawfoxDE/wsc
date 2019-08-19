@@ -139,10 +139,13 @@ _BUILD32()
 
     cd ../wine-32
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" > ../configure32.log
+    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
     make -j6 > ../compile32.log
     cd ../../
+    echo -en "$BLU Installing wine, please wait                           $RES\n"
+    make install > ../install32.log
+
     _DONE
 
 }
@@ -172,10 +175,14 @@ _BUILD64()
 
     cd ./build/wine-64
     echo -en "$BLU configure 64bit part, please wait                      $RES\n"
-    ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
+    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
     echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
     make -j6 > ../compile64.log # overheat protection for amd8150 in summer :)
 
+    echo -en "$BLU Installing wine, please wait                           $RES\n"
+    make install > ../install64.log
+
+    _DONE
 }
 
 
