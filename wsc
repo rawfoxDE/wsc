@@ -19,7 +19,7 @@ fRED="\e[1;7;33m"
  YLW="\033[1;42m"
 
  RES="\033[0m"
- VER="v0.1-26072019"
+ VER="v0.1-19082019"
 
 # Functions -------------------------------------------------
 
@@ -114,6 +114,71 @@ _PBUILD()
 
 }
 
+_BUILD32()
+{
+    clear
+    echo -en "$BLU Change the wine Install Path ...                      $RES\n
+
+    $YLW Enter new Installation taget: $RES"
+
+    read I
+    if [ $I = "q" ]; then _DONE
+    else
+    mkdir -p --mode=0777 "$I"
+    fi
+
+    echo -en $YLW "Building Wine 32-Bit                                  $RES\n"
+
+    rm -rf ./build/wine-32/* # removing the old install directories
+    rm -rf ./build/wine-64/* # a better solution soon
+
+    mkdir -p --mode=0777 ./build/wine-32
+
+    # compile 64bit version first in order to get wow64
+    # important is the --enable-win64 flag
+
+    cd ../wine-32
+    echo -en "$BLU configure 32bit part, please wait                      $RES\n"
+    ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" > ../configure32.log
+    echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
+    make -j6 > ../compile32.log
+    cd ../../
+    _DONE
+
+}
+
+_BUILD64()
+{
+    clear
+    echo -en "$BLU Change the wine Install Path ...                      $RES\n
+
+    $YLW Enter new Installation taget: $RES"
+
+    read I
+    if [ $I = "q" ]; then _DONE
+    else
+    mkdir -p --mode=0777 "$I"
+    fi
+
+    echo -en $YLW "Building Wine 64-Bit                                   $RES\n"
+
+    rm -rf ./build/wine-32/* # removing the old install directories
+    rm -rf ./build/wine-64/* # a better solution soon
+
+    mkdir -p --mode=0777 ./build/wine-64
+
+    # compile 64bit version first in order to get wow64
+    # important is the --enable-win64 flag
+
+    cd ./build/wine-64
+    echo -en "$BLU configure 64bit part, please wait                      $RES\n"
+    ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
+    echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
+    make -j6 > ../compile64.log # overheat protection for amd8150 in summer :)
+
+}
+
+
 # _INSTALL is called when you select Install from menu
 # it will just do a make install on both builds, the 32bit and the 64bit
 _INSTALL()
@@ -206,8 +271,9 @@ echo -en "      $GRN   $WineVer   $RES
 $RED 1 $RES - Help                 $RED 3 $RES - Check Wine Vanilla
 $RED 2 $RES - Check Wine Staging   $RED 4 $RES - Check installed Wine version
 
-$RED 5 $RES - INJECT STAGING       $BLU p $RES - Apply my Patches
-$RED 6 $RES - COMPILE WORKDIR      $RED i $RES - INSTALL
+$RED 5 $RES - INJECT STAGING       $RED 6 $RES - BUILD BIARCH
+$BLU p $RES - Apply my Patches     $RED 7 $RES - BUILD 64-Bit
+$GRN i $RES - INSTALL              $RED 8 $RES - BUILD 32-Bit
 $RED P $RES - CHANGE INSTALL PREFIX
 
 $RED a $RES - Get current wine-staging SHA1
@@ -216,7 +282,7 @@ $RED c $RES - Stash changes and reset source to vanilla wine
 
 $BLU k $RES - Copy Vanilla to workdir
 
-$RED 8 $RES - Install Prerequisits
+$RED Q $RES - Install Prerequisits
 $RED 9 $RES - Get a new Wine Staging source
 $GRN 0 $RES - Get a new Vanilla Wine source           $RED q $RES - Quit
 $RED r $RES - Get a specific Wine release version
@@ -283,7 +349,20 @@ case $X in
 
 ;;
 
+[7]* )
+
+    _BUILD64
+
+;;
+
 [8]* )
+
+    _BUILD32
+
+;;
+
+
+[Q]* )
 
     _PRE-INSTALL
 
