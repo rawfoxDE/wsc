@@ -19,7 +19,12 @@ fRED="\e[1;7;33m"
  YLW="\033[1;42m"
 
  RES="\033[0m"
- VER="v0.1-19082019"
+ VER="v0.1-24092019"
+
+# number of cores to compile on
+THREADS="-j8"
+# build arguments
+ARGS="--without-gtk3"
 
 # Functions -------------------------------------------------
 
@@ -49,16 +54,16 @@ _BUILD()
     echo -en "$BLU configure 64bit part, please wait                      $RES\n"
     ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
     echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-    make -j6 > ../compile64.log # overheat protection for amd8150 in summer :)
+    make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
 
     # compile the 32bit version now
     # the flag --with-wine64=/path includes the former 64bit build
 
     cd ../wine-32
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 > ../configure32.log
+    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 $ARGS > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
-    make -j6 > ../compile32.log
+    make $THREADS > ../compile32.log
     cd ../../
     _DONE
 
@@ -92,7 +97,7 @@ _PBUILD()
     echo -en "$BLU configure 64bit part, please wait                      $RES\n"
     ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
     echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-    make -j6 > ../compile64.log # overheat protection for amd8150 in summer :)
+    make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
 
     # compile the 32bit version now
     # the flag --with-wine64=/path includes the former 64bit build
@@ -101,7 +106,7 @@ _PBUILD()
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
     ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
-    make -j6 > ../compile32.log
+    make $THREADS > ../compile32.log
     cd ../../
 
     echo -en "$BLU Installing wine, please wait                           $RES\n"
@@ -139,9 +144,9 @@ _BUILD32()
 
     cd ../wine-32
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" > ../configure32.log
+    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
-    make -j6 > ../compile32.log
+    make $THREADS > ../compile32.log
     cd ../../
     echo -en "$BLU Installing wine, please wait                           $RES\n"
     make install > ../install32.log
@@ -177,7 +182,7 @@ _BUILD64()
     echo -en "$BLU configure 64bit part, please wait                      $RES\n"
     ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
     echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-    make -j6 > ../compile64.log # overheat protection for amd8150 in summer :)
+    make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
 
     echo -en "$BLU Installing wine, please wait                           $RES\n"
     make install > ../install64.log
@@ -281,7 +286,7 @@ $RED 2 $RES - Check Wine Staging   $RED 4 $RES - Check installed Wine version
 $RED 5 $RES - INJECT STAGING       $RED 6 $RES - BUILD BIARCH
 $BLU p $RES - Apply my Patches     $RED 7 $RES - BUILD 64-Bit
 $GRN i $RES - INSTALL              $RED 8 $RES - BUILD 32-Bit
-$RED P $RES - CHANGE INSTALL PREFIX
+$RED P $RES - CHANGE INSTALL PATH  
 
 $RED a $RES - Get current wine-staging SHA1
 $RED b $RES - Rebase wine source to the wine-staging Hash
@@ -432,10 +437,17 @@ case $X in
     clear
     echo -en $fRED "Patching Sources ...                                   $RES \n" 
     cd ./workdir
-    patch -p1 < ../patches/*1*.patch
-    patch -p1 < ../patches/*2*.patch
-    patch -p1 < ../patches/*3*.patch
-    patch -p1 < ../patches/*4*.patch
+    x=1
+    for (( c=1; c<=x; c++ ))
+    do
+	if [ ! -f ../patches/*$x*.patch ]; 
+	then echo -en "$BLU NO MORE PATCHES $RES \n"
+        else
+        echo -en "$BLU ------> Patch number $x $RES \n"
+        patch -p1 < ../patches/*$x*.patch
+        x=$((x+1))
+        fi
+    done
 
     cd ..
 
