@@ -24,7 +24,8 @@ fRED="\e[1;7;33m"
 # number of cores to compile on
 THREADS="-j8"
 # build arguments
-ARGS="--without-gtk3"
+ARGS_32="--without-gtk3"
+ARGS_64="--enable-win64"
 
 # Functions -------------------------------------------------
 
@@ -52,7 +53,7 @@ _BUILD()
 
     cd ./build/wine-64
     echo -en "$BLU configure 64bit part, please wait                      $RES\n"
-    ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
+    ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
     echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
     make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
 
@@ -61,7 +62,7 @@ _BUILD()
 
     cd ../wine-32
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 $ARGS > ../configure32.log
+    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 $ARGS_32 > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
     make $THREADS > ../compile32.log
     cd ../../
@@ -95,7 +96,7 @@ _PBUILD()
 
     cd ./build/wine-64
     echo -en "$BLU configure 64bit part, please wait                      $RES\n"
-    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
+    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
     echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
     make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
 
@@ -104,7 +105,7 @@ _PBUILD()
 
     cd ../wine-32
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 > ../configure32.log
+    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 $ARGS_32 > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
     make $THREADS > ../compile32.log
     cd ../../
@@ -144,7 +145,7 @@ _BUILD32()
 
     cd ../wine-32
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS > ../configure32.log
+    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_32 > ../configure32.log
     echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
     make $THREADS > ../compile32.log
     cd ../../
@@ -180,7 +181,7 @@ _BUILD64()
 
     cd ./build/wine-64
     echo -en "$BLU configure 64bit part, please wait                      $RES\n"
-    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --enable-win64 > ../configure64.log
+    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
     echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
     make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
 
