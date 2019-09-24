@@ -1,8 +1,6 @@
-11082019
---------
-A lot has changed.
-Implement a function to change the configure --prefix to a custom location.
-
-02112018
---------
-implement source rebase on hashtags
+Rewrite of the patch function, patches must have the format *[num]*.patch
+Implement exclusive 32/64bit builds
+Implement a function to change the configure --prefix to a custom location
+Implement $THREADS variable for number of cores/threads to use on compile
+Implement $ARGS variable for optional build arguments
+Implement source rebase on hashtags
