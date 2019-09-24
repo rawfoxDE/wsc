@@ -24,8 +24,9 @@ fRED="\e[1;7;33m"
 # number of cores to compile on
 THREADS="-j8"
 # build arguments
-ARGS_32="--without-gtk3"
+ARGS_32="--without-gtk3 --without-freetype"
 ARGS_64="--enable-win64"
+STG_ARGS="--all -W user32-rawinput"
 
 # Functions -------------------------------------------------
 
@@ -351,7 +352,7 @@ case $X in
     echo -en $RED "prepareing source and injecting --all patches !!!      $RES\n"
     cd ./workdir/
     ln -s "../wine-staging/patches"
-    ./patches/patchinstall.sh --all
+    ./patches/patchinstall.sh $STG_ARGS
     cd ..
 
 ;;
