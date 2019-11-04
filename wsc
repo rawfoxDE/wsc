@@ -22,13 +22,44 @@ fRED="\e[1;7;33m"
  VER="v0.1-24092019"
 
 # number of cores to compile on
-THREADS="-j8"
+THREADS="-j16"
 # build arguments
-ARGS_32="--without-gtk3 --without-freetype"
+ARGS_32="" #--without-gtk3 --without-freetype"
 ARGS_64="--enable-win64"
-STG_ARGS="--all -W user32-rawinput"
+# define wich staging patchsets should be in- / excluded
+#STG_ARGS="-all -W user32-rawinput"
+STG_ARGS="--all"
 
 # Functions -------------------------------------------------
+
+_SETARGS()
+{
+    clear    
+    
+    echo -en "$BLU Current build options                                  $RES\n\n"
+    
+    echo -en "$GRN Staging patches setup:$RES\n"
+    echo -en "$RED $STG_ARGS $RES\n\n"
+    
+    echo -en "$GRN 32bit build setup:$RES\n"
+    echo -en "$RED $ARGS_32 $RES\n\n"
+    
+    echo -en "$GRN 64bit build setup:$RES\n"
+    echo -en "$RED $ARGS_64 $RES\n\n"
+    
+    echo -en "$GRN Threads to compile on: $RES\n"
+    echo -en "$RED $THREADS $RES\n\n"
+    
+    echo -en "$GRN Current path: $RES\n"
+    echo -en "$RED $PWD $RES\n\n"
+    
+    
+    echo -en "$BLU Hit ENTER to return$RES"    
+        
+   read Q
+   clear 
+        
+}
 
 # _DONE is called, whenever an action is done
 # it is only a message
@@ -87,7 +118,7 @@ _PBUILD()
     echo -en $YLW "\nBuilding Wine                                        $RES\n"
 
     rm -rf ./build/wine-32/* # removing the old install directories
-    rm -rf ./build/wine-64/* # a better solution soon
+    rm -rf ./build/wine-64/*
 
     mkdir -p --mode=0777 ./build/wine-32
     mkdir -p --mode=0777 ./build/wine-64
@@ -282,7 +313,7 @@ do
 # menu selection
 echo -en     $BLU "WINE SOURCE CONTROL $VER by rawfox            $RES\n"
 echo -en "      $GRN   $WineVer   $RES
-$RED 1 $RES - Help                 $RED 3 $RES - Check Wine Vanilla
+$RED 1 $RES - Build setup          $RED 3 $RES - Check Wine Vanilla
 $RED 2 $RES - Check Wine Staging   $RED 4 $RES - Check installed Wine version
 
 $RED 5 $RES - INJECT STAGING       $RED 6 $RES - BUILD BIARCH
@@ -309,10 +340,8 @@ read X
 case $X in
 
 [1]* )
-    clear
-#    less ./README.md
-#    cd ..
-    echo -en $BLU "Help coming soon ...                                   $RES\n"
+
+    _SETARGS
 
 ;;
 
