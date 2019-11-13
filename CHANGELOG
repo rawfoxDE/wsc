@@ -1,3 +1,4 @@
+Implement changeable build setup options
 Rewrite of the patch function, patches must have the format *[num]*.patch
 Implement exclusive 32/64bit builds
 Implement a function to change the configure --prefix to a custom location
