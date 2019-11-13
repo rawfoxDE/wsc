@@ -19,46 +19,96 @@ fRED="\e[1;7;33m"
  YLW="\033[1;42m"
 
  RES="\033[0m"
- VER="v0.1-24092019"
+ VER="v0.1-13112019"
 
 # number of cores to compile on
 THREADS="-j16"
-# build arguments
+# default build arguments
 ARGS_32="" #--without-gtk3 --without-freetype"
 ARGS_64="--enable-win64"
-# define wich staging patchsets should be in- / excluded
-#STG_ARGS="-all -W user32-rawinput"
+# define wich default staging patchsets should be in- / excluded
 STG_ARGS="--all"
 
 # Functions -------------------------------------------------
 
 _SETARGS()
 {
-    clear    
-    
+    clear
+
     echo -en "$BLU Current build options                                  $RES\n\n"
-    
     echo -en "$GRN Staging patches setup:$RES\n"
-    echo -en "$RED $STG_ARGS $RES\n\n"
-    
+    echo -en "$YLW $STG_ARGS $RES\n"
     echo -en "$GRN 32bit build setup:$RES\n"
-    echo -en "$RED $ARGS_32 $RES\n\n"
-    
+    echo -en "$YLW $ARGS_32 $RES\n"
     echo -en "$GRN 64bit build setup:$RES\n"
-    echo -en "$RED $ARGS_64 $RES\n\n"
-    
-    echo -en "$GRN Threads to compile on: $RES\n"
-    echo -en "$RED $THREADS $RES\n\n"
-    
-    echo -en "$GRN Current path: $RES\n"
-    echo -en "$RED $PWD $RES\n\n"
-    
-    
-    echo -en "$BLU Hit ENTER to return$RES"    
+    echo -en "$YLW $ARGS_64 $RES\n\n"
+    echo -en "$GRN Threads to compile on: $RES"
+    echo -en "$YLW $THREADS $RES\n"
+    echo -en "$GRN Current path: $RES"
+    echo -en "$YLW $PWD $RES\n\n"
+    echo -en "$BLU Change or hit ENTER to return$RES\n\n"
+
+    echo -en "$RED 1 $RES - Change staging Patchset\n"
+    echo -en "$RED 2 $RES - Change 32-bit build options\n"
+    echo -en "$RED 3 $RES - Change 64-bit build options\n"
+    echo -en "$RED 4 $RES - Change threads to build on\n\n==> "
+
+    read Z
+    case $Z in
+
+        [1]* )
+            echo -en "Current Staging options:\n $STG_ARGS\n"
+            echo -en "Enter new options:\n"
+    	    read STG
+    	    if [ $STG = "q" ]; then _DONE
+    	    else
+    	    STG_ARGS=$STG
+    	    fi
+        ;;
+
+        [2]* )
+
+	    echo -en "Current 32-Bit build options:\n $STG_ARGS\n"
+    	    echo -en "Enter new options:\n"
         
-   read Q
-   clear 
+    	    read TT
+    	    if [ $TT = "q" ]; then _DONE
+    	    else 
+    	    ARGS_32=$TT
+    	    fi
+	;;
+
+        [3]* )
+
+	    echo -en "Current 64-Bit build options:\n $STG_ARGS\n"
+    	    echo -en "Enter new options:\n"
         
+    	    read TF
+    	    if [ $TF = "q" ]; then _DONE
+    	    else 
+    	    ARGS_64=$TF
+    	    fi
+	;;
+
+        [4]* )
+
+	    echo -en "Current threads to build on:\n $THREADS\n"
+    	    echo -en "Enter new options:\n"
+        
+    	    read TH
+    	    if [ $TH = "q" ]; then _DONE
+    	    else 
+    	    THREADS=$TH
+    	    fi
+	;;
+
+
+    esac
+    clear
+    echo -en "$RED New options are set !!!                                 $RES\n"
+    # End of while loop
+#    done
+
 }
 
 # _DONE is called, whenever an action is done
@@ -90,7 +140,7 @@ _BUILD()
     make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
 
     # compile the 32bit version now
-    # the flag --with-wine64=/path includes the former 64bit build
+    # the flag --with-wine64=/path includes the former 64bit build to make it a biarch wow64 build
 
     cd ../wine-32
     echo -en "$BLU configure 32bit part, please wait                      $RES\n"
@@ -314,16 +364,17 @@ do
 echo -en     $BLU "WINE SOURCE CONTROL $VER by rawfox            $RES\n"
 echo -en "      $GRN   $WineVer   $RES
 $RED 1 $RES - Build setup          $RED 3 $RES - Check Wine Vanilla
-$RED 2 $RES - Check Wine Staging   $RED 4 $RES - Check installed Wine version
+$RED 4 $RES - Check installed Wine $RED 2 $RES - Check Wine Staging
 
 $RED 5 $RES - INJECT STAGING       $RED 6 $RES - BUILD BIARCH
 $BLU p $RES - Apply my Patches     $RED 7 $RES - BUILD 64-Bit
 $GRN i $RES - INSTALL              $RED 8 $RES - BUILD 32-Bit
-$RED P $RES - CHANGE INSTALL PATH  
+$RED P $RES - CHANGE INSTALL PATH
 
 $RED a $RES - Get current wine-staging SHA1
 $RED b $RES - Rebase wine source to the wine-staging Hash
 $RED c $RES - Stash changes and reset source to vanilla wine
+$RED R $RES - Rebase workdir source to SHA1
 
 $BLU k $RES - Copy Vanilla to workdir
 
@@ -331,7 +382,6 @@ $RED Q $RES - Install Prerequisits
 $RED 9 $RES - Get a new Wine Staging source
 $GRN 0 $RES - Get a new Vanilla Wine source           $RED q $RES - Quit
 $RED r $RES - Get a specific Wine release version
-$RED R $RES - Rebase workdir source to SHA1
       $GRN $CUR_PATH $RES
 $BLU ------------------------------------------------------ $RES
 $YLW ==> $RES  "
