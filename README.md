@@ -10,37 +10,33 @@ The incredible modularity of the wine sources give a lot of options to reach a g
 Out of experience, a wow64 build of wine has the most flexibility when it comes to handle the different modes like 32bit, 64bit, DX7,8,9,10,11, WinXP to Windows10 so i've been exclusivly focusing that build type, Windows on Windows64.
 
 Actually i needed a tool to
-1. download vanilla and staging
-2. build and install me a vanilla-wine
-3. build and install me a wine-staging
-4. build a modified local source
-5. patch the source with own patches
-6. prepare a source and inject staging
+- download vanilla and staging
+- build and install me a vanilla-wine
+- build and install me a wine-staging
+- build a modified local source
+- patch the source with own patches
+- prepare a source and inject staging
+- ...
 
 The directories are:
 
 ./              - a empty dir with wsc in it or wsc in path called from inside a empty dir is the basic dir for wsc.
 
 ./build/wine32  - build dir for the 32bit wine
-
 ./build/wine64  - build dir for the 64bit wine, contents of both is deleted on a new build
-
 ./wine-staging  - contains the wine staging patches, download with '9' or copy in from local source
-
 ./workdir       - this is Workdir, in this dir the sources get modified, patched, restored
-
 ./wine-vanilla  - contains the wine vanilla source, can be used to copy to workdir for a fresh source in there ('k') or build directly from there with 'v'
-
-./patches 	- a place for your patches, this will be reworked soon as you still have to enter the patchname in the wsc script
+./patches 	- a place for your patches
 
 Usage:
 
 Command overview:
 ==========================================================================================================
 
-1 - Help
+1 - Build setup
 -----------------
-Has to be done yet ..
+Here you can see and change the different options for your wine build.
 
 2 - Check Wine Staging
 ----------------------
@@ -119,19 +115,20 @@ This is different from the most distribution packages as they went into /usr/* .
 
 Very first look into the script!
 Check what the single functions do, this script is just a tool to reduce the typing in the console ^^
-Wsc will always create a wow64 wine build, building the 32bit and 64bit versions in relation.
 
 Create a directory in what you gonna work with wsc.
 Get a bash up, join your directory and call the script with ./wsc
 Start with getting new sources for vanilla-wine (press '0') and wine-staging (press '9').
+note:
+Best you clone wsc from git and symlink it to /usr/local/bin so you can start your wine experiments just by cd into a empty dir.
 
-Building Vanilla:
+- Building Vanilla:
 Wsc is focusing a workdir for a modified wine build, but can build a vanilla-wine as well 
 (press 'k' to copy Vanilla wine to the workdir).
 After building, you have to install it (press 'i') and it will install to /usr/local/* - the default installation location.
 If you want other install targets within your user rights, just press 'P' and enter your path.
 
-To build wine-staging, you want rebase the vanilla sources to the actual wine staging version.
+To build a current wine-staging, you want rebase the vanilla sources to the actual wine staging version.
 
 k -> a -> b -> 5 -> 6 -> i
 
@@ -143,3 +140,6 @@ k -> a -> b -> 5 -> 6 -> i
 (press 'i') to install wine-staging.
 
 Again, look into the script, visit the compiler calls and modify to your needs !
+
+
+
