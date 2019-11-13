@@ -1,11 +1,10 @@
 # wsc
 wine source control
-
-This bash script will download the needed files and is able to compile a wow64 build of Vanilla Wine.
-It also can rebase the wine vanilla source to the actual wine staging version, inject all staging patches and built it.
+--
+This bash script will download the needed files and is able to build Wine in different modes.
 
 Concept:
-
+--
 The incredible modularity of the wine sources give a lot of options to reach a good working wine core that can serve all the certain prefixes for your best gaming experience with Windows games on Linux, using wine.
 Out of experience, a wow64 build of wine has the most flexibility when it comes to handle the different modes like 32bit, 64bit, DX7,8,9,10,11, WinXP to Windows10 so i've been exclusivly focusing that build type, Windows on Windows64.
 
@@ -18,15 +17,17 @@ Actually i needed a tool to
 - prepare a source and inject staging
 - ...
 
-The directories are:
+The directories created by wsc are:
 
 ./              - a empty dir with wsc in it or wsc in path called from inside a empty dir is the basic dir for wsc.
-
 ./build/wine32  - build dir for the 32bit wine
 ./build/wine64  - build dir for the 64bit wine, contents of both is deleted on a new build
 ./wine-staging  - contains the wine staging patches, download with '9' or copy in from local source
 ./workdir       - this is Workdir, in this dir the sources get modified, patched, restored
 ./wine-vanilla  - contains the wine vanilla source, can be used to copy to workdir for a fresh source in there ('k') or build directly from there with 'v'
+./cache         - contains version downloads from getting a wine release
+
+Dirs created by you:
 ./patches 	- a place for your patches
 
 Usage:
@@ -34,84 +35,65 @@ Usage:
 Command overview:
 ==========================================================================================================
 
-1 - Build setup
------------------
+- Build setup
 Here you can see and change the different options for your wine build.
 
-2 - Check Wine Staging
-----------------------
+- Check Wine Staging
 Connects to the wine-staging github and executes 'git pull' in the wine-staging donload dir.
 
-3 - Check Wine Vanilla
-----------------------
+- Check Wine Vanilla
 Connects to the wine github and makes a 'git pull' in the wine vanilla download dir.
 
-4 - Check installed Wine version
---------------------------------
+- Check installed Wine version
 Executes 'wine --version' to quick check the installed wine version
 
-5 - INJECT STAGING
-------------------
+- INJECT STAGING
 Before the wine-staging patches can be injected into the workdir, you need to copy the vanilla source to workdir with 'k'.
 After that you need to get the current version from wine staging into a hashtag ('a') and set the vanilla wine source to the wine-staging version ('b').
 
-6 - COMPILE WORKDIR
--------------------
+- COMPILE WORKDIR
 Builds your patched or modified wine in workdir
 
-a - Get current wine-staging SHA1
----------------------------------
+- Get current wine-staging SHA1
 This command will get the hash tag from the current wine-staging version.
 
-b - Rebase wine source to wine-staging Hash
--------------------------------------------
+- Rebase wine source to wine-staging Hash
 This will modify the sources in workdir to the current version of the wine-staging patchset.
 You need to do this in order to get the wine.staging patches to apply.
 
-c - Stash your changes and reset WORKDIR to vanilla wine
--------------------------------------------------------
+- Stash your changes and reset WORKDIR to vanilla wine
 This will reset the workdir source back to the current vanilla version
 
-8 - Install Prerequisits
-------------------------
+- Install Prerequisits
 Fist hack to install the 32bit prerequisits on your system, in case you miss some.
 
-9- Get a new Wine Staging source
---------------------------------
+- Get a new Wine Staging source
 This just downloads a new wine-staging patchset from Github
 
-0 - Get a new Vanilla wine source
----------------------------------
+- Get a new Vanilla wine source
 Get a new Vanilla source from the wine Github.
 This goes not into workdir, its going into Vanilla dir so you can build vanilla anytime.
 Workdir is the place for the modified/patched Vanilla build.
 
-r - Get a certain wine-release version
---------------------------------------
+- Get a certain wine-release version
 Lets you enter a wine release version of your choice, what is available in the main wine release repo.
 It will download and unpack to wine-vanilla and wine-staging dir's so to unite them, need to copy to workdir first (k).
 No need to tweak the wine source to the wine-staging source because its a release version.
 
-R - Reset the source to SHA1
-----------------------------
+- Reset the source to SHA1
 Resets the source in ./workdir to a given hash tag.
 
-p - Apply my Patches
---------------------
+- Apply my Patches
 Applies patches from ./patches dir to workdir.
 For the case you need something special patched in :)
 
-P - use a custom install path
------------------------------
+- use a custom install path
 Changes the installation path to a custom location within the users rights.
 It does not install as superuser.
 
-i - INSTALL
------------
+- INSTALL
 Install your build default to /usr/local/* .
 This is different from the most distribution packages as they went into /usr/* .
-
-==========================================================================================================
 
 Very first look into the script!
 Check what the single functions do, this script is just a tool to reduce the typing in the console ^^
