@@ -3,10 +3,15 @@ wine source control
 --
 This bash script will download the needed files and is able to build Wine in different modes.
 
+Usage
+--
+Clone wsc from git and symlink wsc to your $PATH, for example /usr/local/bin/wsc, so you can just join a empty directory 
+and call the script. Else the wsc script must be present in the directory you want to build wine in.
+
 Concept:
 --
-The incredible modularity of the wine sources give a lot of options to reach a good working wine core that can serve all the certain prefixes for your best gaming experience with Windows games on Linux, using wine.
-Out of experience, a wow64 build of wine has the most flexibility when it comes to handle the different modes like 32bit, 64bit, DX7,8,9,10,11, WinXP to Windows10 so i've been exclusivly focusing that build type, Windows on Windows64.
+The incredible modularity of the wine sources give a lot of options to reach a good working wine core that can serve all the 
+certain prefixes for your best gaming experience with Windows games on Linux, using wine.
 
 Actually i needed a tool to
 - download vanilla and staging
@@ -19,16 +24,16 @@ Actually i needed a tool to
 
 The directories created by wsc are:
 
-./              - a empty dir with wsc in it or wsc in path called from inside a empty dir is the basic dir for wsc.
-./build/wine32  - build dir for the 32bit wine
-./build/wine64  - build dir for the 64bit wine, contents of both is deleted on a new build
-./wine-staging  - contains the wine staging patches, download with '9' or copy in from local source
-./workdir       - this is Workdir, in this dir the sources get modified, patched, restored
-./wine-vanilla  - contains the wine vanilla source, can be used to copy to workdir for a fresh source in there ('k') or build directly from there with 'v'
-./cache         - contains version downloads from getting a wine release
+- ./              - a empty dir with wsc in it or wsc in path called from inside a empty dir is the basic dir for wsc.
+- ./build/wine32  - build dir for the 32bit wine
+- ./build/wine64  - build dir for the 64bit wine, contents of both is deleted on a new build
+- ./wine-staging  - contains the wine staging patches, download with '9' or copy in from local source
+- ./workdir       - this is Workdir, in this dir the sources get modified, patched, restored
+- ./wine-vanilla  - contains the wine vanilla source, can be used to copy to workdir for a fresh source in there ('k') or build directly from there with 'v'
+- ./cache         - contains version downloads from getting a wine release
 
 Dirs created by you:
-./patches 	- a place for your patches
+- ./patches 	- a place for your patches
 
 Usage:
 
@@ -96,30 +101,32 @@ Install your build default to /usr/local/* .
 This is different from the most distribution packages as they went into /usr/* .
 
 Very first look into the script!
+
 Check what the single functions do, this script is just a tool to reduce the typing in the console ^^
 
-Create a directory in what you gonna work with wsc.
-Get a bash up, join your directory and call the script with ./wsc
+- Create a directory in what you gonna work with wsc.
+Get a bash up, join your directory and call the script with 'wsc' (once you symlinked it to /usr/local/bin/wsc).
+
 Start with getting new sources for vanilla-wine (press '0') and wine-staging (press '9').
-note:
-Best you clone wsc from git and symlink it to /usr/local/bin so you can start your wine experiments just by cd into a empty dir.
+
 
 - Building Vanilla:
-Wsc is focusing a workdir for a modified wine build, but can build a vanilla-wine as well 
-(press 'k' to copy Vanilla wine to the workdir).
-After building, you have to install it (press 'i') and it will install to /usr/local/* - the default installation location.
-If you want other install targets within your user rights, just press 'P' and enter your path.
+Wsc is focusing a workdir for a modified wine build (press 'k' to copy Vanilla wine to the workdir).
+The concept of working in a workdir has some advantages, as the sources stay untouched and can quick get modified.
+
+After building, you have to install it (press 'I') and it will install to /usr/local/* - the default installation location.
+If you want other install targets, you want to review the build settings (press '3') and change them to your needs.
 
 To build a current wine-staging, you want rebase the vanilla sources to the actual wine staging version.
 
-k -> a -> b -> 5 -> 6 -> i
+k -> a -> b -> j -> B -> I
 
 (press 'k') to copy the Vanilla source to workdir.
 (press 'a') to get the actual wine-staging hash tag.
 (press 'b') to base/set the wine vanilla sources to the wine-staging hash version.
-(press '5') to inject the wine-staging patches.
-(press '6') to build wine staging.
-(press 'i') to install wine-staging.
+(press 'j') to inject the wine-staging patches.
+(press 'B') to build wine staging.
+(press 'I') to install wine-staging.
 
 Again, look into the script, visit the compiler calls and modify to your needs !
 
