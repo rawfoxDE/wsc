@@ -10,17 +10,18 @@
 #################################################################################
 
 # eye candy, practice on ANSI escape sequencies xD
-
  RED="\033[1;41m"
  BLU="\033[44m"
  GRN="\033[1;43m"
-fBLU="\033[34m"
-fRED="\e[1;7;33m"
+fBLU="\033[1;46m"
+fRED="\033[1;7;33m"
  YLW="\033[1;42m"
-
  RES="\033[0m"
- VER="v0.1-13112019"
+ VER="v0.1-19112019"
 
+# Build setup -----------------------------------------------
+INSTALL_PREFIX="/usr/local"
+BUILD_TYPE="WOW64"
 # number of cores to compile on
 THREADS="-j16"
 # default build arguments
@@ -28,84 +29,126 @@ ARGS_32="" #--without-gtk3 --without-freetype"
 ARGS_64="--enable-win64"
 # define wich default staging patchsets should be in- / excluded
 STG_ARGS="--all"
-
 # Functions -------------------------------------------------
 
 _SETARGS()
 {
     clear
 
-    echo -en "$BLU Current build options                                  $RES\n\n"
+    echo -en "$BLU Current build options                                  $RES\n"
     echo -en "$GRN Staging patches setup:$RES\n"
-    echo -en "$YLW $STG_ARGS $RES\n"
+    echo -en "$STG_ARGS\n"
     echo -en "$GRN 32bit build setup:$RES\n"
-    echo -en "$YLW $ARGS_32 $RES\n"
+    echo -en "$ARGS_32\n"
     echo -en "$GRN 64bit build setup:$RES\n"
-    echo -en "$YLW $ARGS_64 $RES\n\n"
-    echo -en "$GRN Threads to compile on: $RES"
-    echo -en "$YLW $THREADS $RES\n"
-    echo -en "$GRN Current path: $RES"
-    echo -en "$YLW $PWD $RES\n\n"
-    echo -en "$BLU Change or hit ENTER to return$RES\n\n"
+    echo -en "$ARGS_64\n"
+    echo -en "$GRN Threads to compile on: $RES\n"
+    echo -en "$THREADS\n"
+    echo -en "$GRN Current source path: $RES\n"
+    echo -en "$PWD\n"
+    echo -en "$GRN Wine Installation Prefix: $RES\n"
+    echo -en "$INSTALL_PREFIX\n"
+    echo -en "$GRN Wine build type: $RES\n"
+    echo -en "$BUILD_TYPE\n"
+
+    echo -en "$BLU Change or hit ENTER to return                          $RES\n\n"
 
     echo -en "$RED 1 $RES - Change staging Patchset\n"
     echo -en "$RED 2 $RES - Change 32-bit build options\n"
     echo -en "$RED 3 $RES - Change 64-bit build options\n"
-    echo -en "$RED 4 $RES - Change threads to build on\n\n==> "
-
+    echo -en "$fBLU 4 $RES - Change threads to build on\n"
+    echo -en "$fRED 5 $RES - Change Wine build typ\n"
+    echo -en "$fRED 6 $RES - Change installation prefix\n\n==> "
+    
     read Z
     case $Z in
 
         [1]* )
             echo -en "Current Staging options:\n $STG_ARGS\n"
             echo -en "Enter new options:\n"
-    	    read STG
-    	    if [ $STG = "q" ]; then _DONE
-    	    else
-    	    STG_ARGS=$STG
-    	    fi
+            read STG
+            if [ $STG = "q" ]; then _DONE
+            else
+            STG_ARGS=$STG
+            fi
         ;;
 
         [2]* )
 
-	    echo -en "Current 32-Bit build options:\n $STG_ARGS\n"
-    	    echo -en "Enter new options:\n"
-        
-    	    read TT
-    	    if [ $TT = "q" ]; then _DONE
-    	    else 
-    	    ARGS_32=$TT
-    	    fi
-	;;
+            echo -en "Current 32-Bit build options:\n $STG_ARGS\n"
+            echo -en "Enter new options:\n"
+
+            read TT
+            if [ $TT = "q" ]; then _DONE
+            else
+            ARGS_32=$TT
+           fi
+        ;;
 
         [3]* )
 
-	    echo -en "Current 64-Bit build options:\n $STG_ARGS\n"
-    	    echo -en "Enter new options:\n"
-        
-    	    read TF
-    	    if [ $TF = "q" ]; then _DONE
-    	    else 
-    	    ARGS_64=$TF
-    	    fi
-	;;
+            echo -en "Current 64-Bit build options:\n $STG_ARGS\n"
+            echo -en "Enter new options:\n"
+
+            read TF
+            if [ $TF = "q" ]; then _DONE
+            else
+            ARGS_64=$TF
+            fi
+        ;;
 
         [4]* )
 
-	    echo -en "Current threads to build on:\n $THREADS\n"
-    	    echo -en "Enter new options:\n"
-        
-    	    read TH
-    	    if [ $TH = "q" ]; then _DONE
-    	    else 
-    	    THREADS=$TH
-    	    fi
-	;;
+            echo -en "Current threads to build on:\n $THREADS\n"
+            echo -en "Enter new options:\n"
 
+            read TH
+            if [ $TH = "q" ]; then _DONE
+            else 
+            THREADS=$TH
+            fi
+        ;;
+
+        [5]* )
+
+            clear
+            echo -en "$BLU Change the arch typ of the wine build          $RES\n\n"
+            echo -en "Default setup is a wow64 biarch wine build installed in /usr/local\n\n"
+
+            echo -en "$RED 1 $RES - Set build $GRN BiArch $RES wow64 wine\n"
+            echo -en "$RED 2 $RES - Set build $GRN 32-Bit $RES only wine \n"
+            echo -en "$RED 3 $RES - Set build $GRN 64-Bit $RES only wine \n\n==> "
+
+            read BT
+            case $BT in
+
+            [1]* )
+                   BUILD_TYPE="WOW64"
+            ;;
+            [2]* )
+                   BUILD_TYPE="32BIT"
+            ;;
+            [3]* )
+                   BUILD_TYPE="64BIT"
+            ;;
+            esac
+        ;;
+
+        [6]* )
+
+            echo -en "Change installation prefix path\n"
+            echo -en "Enter new prefix:\n"
+
+            read IP
+            if [ $IP = "q" ]; then _DONE
+            else 
+            INSTALL_PREFIX=$IP
+            fi
+        ;;
 
     esac
     clear
-    echo -en "$RED New options are set !!!                                 $RES\n"
+    echo -en "$RED New options are set !!!                                $RES\n"
     # End of while loop
 #    done
 
@@ -118,171 +161,86 @@ _DONE()
     echo -en "$YLW ALL DONE !!!                                           $RES\n"
 }
 
-# _BUILD is called when you are ready to compile the sources
-# either after upgrading the vanilla wine source or the wine-staging source
-_BUILD()
+_NEWBUILD()
 {
+    clear
+
+    echo -en $YLW "Building Wine                                          $RES\n"
+    echo -en "Build Typ: $BUILD_TYPE \n"
+    echo -en "Install path : $INSTALL_PREFIX \n"
     echo -en $YLW "Building Wine                                          $RES\n"
 
-    rm -rf ./build/wine-32/* # removing the old install directories
-    rm -rf ./build/wine-64/* # a better solution soon
+    # clean the build directory
+    rm -rf ./build/*
 
-    mkdir -p --mode=0777 ./build/wine-32
-    mkdir -p --mode=0777 ./build/wine-64
+    if [ $BUILD_TYPE = "32BIT" ]
+    then 
+        mkdir -p --mode=0777 ./build/wine-32
+        cd ./build/wine-32
+        echo -en "$BLU configure 32bit part, please wait ...                  $RES\n"
+        ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_32 > ../configure32.log
+        echo -en "$GRN compiling 32bit part now, please wait ...              $RES\n"
+        make $THREADS > ../compile32.log
+        cd ../../
 
-    # compile 64bit version first in order to get wow64
-    # important is the --enable-win64 flag
+    elif [ $BUILD_TYPE = "64BIT" ]
+    then
+        mkdir -p --mode=0777 ./build/wine-64
+        cd ./build/wine-64
+        echo -en "$BLU configure 64bit part, please wait                      $RES\n"
+        ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
+        echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
+        make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
+        cd ../../
 
-    cd ./build/wine-64
-    echo -en "$BLU configure 64bit part, please wait                      $RES\n"
-    ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
-    echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-    make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
+    elif [ $BUILD_TYPE = "WOW64" ]
+    then
+        mkdir -p --mode=0777 ./build/wine-32
+        mkdir -p --mode=0777 ./build/wine-64
 
-    # compile the 32bit version now
-    # the flag --with-wine64=/path includes the former 64bit build to make it a biarch wow64 build
+        cd ./build/wine-64
+        echo -en "$BLU configure 64bit part, please wait                      $RES\n"
+        ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
+        echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
+        make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
 
-    cd ../wine-32
-    echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../workdir/configure CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 $ARGS_32 > ../configure32.log
-    echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
-    make $THREADS > ../compile32.log
-    cd ../../
-    _DONE
-
-}
-
-_PBUILD()
-{
-    clear
-    echo -en "$BLU Change the wine Install Path ...                      $RES\n
-
-    $YLW Enter new Installation taget: $RES"
-
-    read I
-    if [ $I = "q" ]; then _DONE
-    else
-    mkdir -p --mode=0777 "$I"
+        cd ../wine-32
+        echo -en "$BLU configure 32bit part, please wait                      $RES\n"
+        PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 $ARGS_32 > ../configure32.log
+        echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
+        make $THREADS > ../compile32.log
+        cd ../../
     fi
 
-    echo -en $YLW "\nBuilding Wine                                        $RES\n"
-
-    rm -rf ./build/wine-32/* # removing the old install directories
-    rm -rf ./build/wine-64/*
-
-    mkdir -p --mode=0777 ./build/wine-32
-    mkdir -p --mode=0777 ./build/wine-64
-
-    # compile 64bit version first in order to get wow64
-    # important is the --enable-win64 flag
-
-    cd ./build/wine-64
-    echo -en "$BLU configure 64bit part, please wait                      $RES\n"
-    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
-    echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-    make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
-
-    # compile the 32bit version now
-    # the flag --with-wine64=/path includes the former 64bit build
-
-    cd ../wine-32
-    echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 $ARGS_32 > ../configure32.log
-    echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
-    make $THREADS > ../compile32.log
-    cd ../../
-
-    echo -en "$BLU Installing wine, please wait                           $RES\n"
-    cd ./build/wine-32
-    make install > ../install32.log
-    cd ../wine-64
-    make install > ../install64.log
-    cd ../../
-    _DONE
-
 }
-
-_BUILD32()
-{
-    clear
-    echo -en "$BLU Change the wine Install Path ...                      $RES\n
-
-    $YLW Enter new Installation taget: $RES"
-
-    read I
-    if [ $I = "q" ]; then _DONE
-    else
-    mkdir -p --mode=0777 "$I"
-    fi
-
-    echo -en $YLW "Building Wine 32-Bit                                  $RES\n"
-
-    rm -rf ./build/wine-32/* # removing the old install directories
-    rm -rf ./build/wine-64/* # a better solution soon
-
-    mkdir -p --mode=0777 ./build/wine-32
-
-    # compile 64bit version first in order to get wow64
-    # important is the --enable-win64 flag
-
-    cd ../wine-32
-    echo -en "$BLU configure 32bit part, please wait                      $RES\n"
-    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_32 > ../configure32.log
-    echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
-    make $THREADS > ../compile32.log
-    cd ../../
-    echo -en "$BLU Installing wine, please wait                           $RES\n"
-    make install > ../install32.log
-
-    _DONE
-
-}
-
-_BUILD64()
-{
-    clear
-    echo -en "$BLU Change the wine Install Path ...                      $RES\n
-
-    $YLW Enter new Installation taget: $RES"
-
-    read I
-    if [ $I = "q" ]; then _DONE
-    else
-    mkdir -p --mode=0777 "$I"
-    fi
-
-    echo -en $YLW "Building Wine 64-Bit                                   $RES\n"
-
-    rm -rf ./build/wine-32/* # removing the old install directories
-    rm -rf ./build/wine-64/* # a better solution soon
-
-    mkdir -p --mode=0777 ./build/wine-64
-
-    # compile 64bit version first in order to get wow64
-    # important is the --enable-win64 flag
-
-    cd ./build/wine-64
-    echo -en "$BLU configure 64bit part, please wait                      $RES\n"
-    ../../workdir/configure --prefix=$I CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
-    echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-    make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
-
-    echo -en "$BLU Installing wine, please wait                           $RES\n"
-    make install > ../install64.log
-
-    _DONE
-}
-
 
 # _INSTALL is called when you select Install from menu
 # it will just do a make install on both builds, the 32bit and the 64bit
 _INSTALL()
 {
     echo -en "$BLU Installing wine, please wait                           $RES\n"
-    cd ./build/wine-32
-    sudo make install > ../install32.log
-    cd ../wine-64
-    sudo make install > ../install64.log
+    if [ -d ./build/wine-32 ];then
+        cd ./build/wine-32
+        make install > ../install32.log
+    fi
+    if [ -d ./build/wine-64 ];then
+        cd ../wine-64
+        make install > ../install64.log
+    fi
+    cd ../../
+
+}
+_SUDO_INSTALL()
+{
+    echo -en "$BLU Installing wine, please wait                           $RES\n"
+    if [ -d ./build/wine-32 ];then
+        cd ./build/wine-32
+        sudo make install > ../install32.log
+    fi
+    if [ -d ./build/wine-64 ];then
+        cd ../wine-64
+        sudo make install > ../install64.log
+    fi
     cd ../../
 
 }
@@ -363,24 +321,22 @@ do
 # menu selection
 echo -en     $BLU "WINE SOURCE CONTROL $VER by rawfox            $RES\n"
 echo -en "      $GRN   $WineVer   $RES
-$RED 1 $RES - Build setup          $RED 3 $RES - Check Wine Vanilla
-$RED 4 $RES - Check installed Wine $RED 2 $RES - Check Wine Staging
-
-$RED 5 $RES - INJECT STAGING       $RED 6 $RES - BUILD BIARCH
-$BLU p $RES - Apply my Patches     $RED 7 $RES - BUILD 64-Bit
-$GRN i $RES - INSTALL              $RED 8 $RES - BUILD 32-Bit
-$RED P $RES - CHANGE INSTALL PATH
+$RED 1 $RES - Check Wine Vanilla       $RED 2 $RES - Check Wine Staging
+$RED k $RES - Copy Vanilla to workdir  $RED j $RES - INJECT STAGING
+$RED 3 $RES - BUILD SETUP              $RED p $RES - Apply my Patches
 
 $RED a $RES - Get current wine-staging SHA1
 $RED b $RES - Rebase wine source to the wine-staging Hash
 $RED c $RES - Stash changes and reset source to vanilla wine
 $RED R $RES - Rebase workdir source to SHA1
 
-$BLU k $RES - Copy Vanilla to workdir
+$RED B $RES - BUILD WINE
+$RED i $RES - INSTALL                  $RED q $RES - Quit
+$RED I $RES - SUDO INSTALL
 
-$RED Q $RES - Install Prerequisits
+$RED v $RES - Check installed Wine
 $RED 9 $RES - Get a new Wine Staging source
-$GRN 0 $RES - Get a new Vanilla Wine source           $RED q $RES - Quit
+$RED 0 $RES - Get a new Vanilla Wine source
 $RED r $RES - Get a specific Wine release version
       $GRN $CUR_PATH $RES
 $BLU ------------------------------------------------------ $RES
@@ -389,12 +345,19 @@ $YLW ==> $RES  "
 read X
 case $X in
 
+# Check wine git for updates
 [1]* )
-
-    _SETARGS
+    clear
+    echo -en $BLU "checking Vanilla Wine updates ..                       $RES\n"
+    cd ./wine-vanilla
+    echo -en $fRED " "
+    git pull
+    echo -en $RES
+    cd ..
 
 ;;
 
+#Check wine-staging git for updates
 [2]* )
     clear
     echo -en $BLU "checking Wine Staging update ..                        $RES\n"
@@ -406,18 +369,15 @@ case $X in
 
 ;;
 
+# Set the building options
 [3]* )
-    clear
-    echo -en $BLU "checking Vanilla Wine updates ..                       $RES\n"
-    cd ./wine-vanilla
-    echo -en $fRED " "
-    git pull
-    echo -en $RES
-    cd ..
+
+    _SETARGS
 
 ;;
 
-[4]* )
+# System wine version check
+[v]* )
     clear
     echo -en $BLU "check installed wine version ...                       $RES\n"
     echo -en $GRN " "
@@ -426,35 +386,24 @@ case $X in
 
 ;;
 
-[5]* )
+# inject the wine patchset including set staging arguments
+# for example to exclude a patchset
+[j]* )
     clear
     echo -en $RED "prepareing source and injecting --all patches !!!      $RES\n"
     cd ./workdir/
     ln -s "../wine-staging/patches"
     ./patches/patchinstall.sh $STG_ARGS
     cd ..
-
 ;;
 
-[6]* )
+# Build the ./workdir source with the choosen options
+[B]* )
 
-    _BUILD
-
+    _NEWBUILD
 ;;
 
-[7]* )
-
-    _BUILD64
-
-;;
-
-[8]* )
-
-    _BUILD32
-
-;;
-
-
+# Fedora related
 [Q]* )
 
     _PRE-INSTALL
@@ -463,6 +412,10 @@ case $X in
 
 [i]* )
     _INSTALL
+
+;;
+[I]* )
+    _SUDO_INSTALL
 
 ;;
 
@@ -521,8 +474,8 @@ case $X in
     x=1
     for (( c=1; c<=x; c++ ))
     do
-	if [ ! -f ../patches/*$x*.patch ]; 
-	then echo -en "$BLU NO MORE PATCHES $RES \n"
+        if [ ! -f ../patches/*$x*.patch ]; 
+        then echo -en "$BLU NO MORE PATCHES $RES \n"
         else
         echo -en "$BLU ------> Patch number $x $RES \n"
         patch -p1 < ../patches/*$x*.patch
@@ -531,7 +484,6 @@ case $X in
     done
 
     cd ..
-
 ;;
 
 [r]* )
