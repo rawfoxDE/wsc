@@ -219,30 +219,44 @@ _NEWBUILD()
 _INSTALL()
 {
     echo -en "$BLU Installing wine, please wait                           $RES\n"
-    if [ -d ./build/wine-32 ];then
+
+    if [ $BUILD_TYPE = "32BIT" ]
+    then
         cd ./build/wine-32
         make install > ../install32.log
-    fi
-    if [ -d ./build/wine-64 ];then
+    elif [ $BUILD_TYPE = "64BIT" ]
+    then
+        cd ./build/wine-64
+        make install > ../install64.log
+    elif [ $BUILD_TYPE = "WOW64" ]
+    then
+        cd ./build/wine-32
+        make install > ../install32.log
         cd ../wine-64
         make install > ../install64.log
     fi
     cd ../../
-
 }
 _SUDO_INSTALL()
 {
     echo -en "$BLU Installing wine, please wait                           $RES\n"
-    if [ -d ./build/wine-32 ];then
+
+    if [ $BUILD_TYPE = "32BIT" ]
+    then
         cd ./build/wine-32
         sudo make install > ../install32.log
-    fi
-    if [ -d ./build/wine-64 ];then
+    elif [ $BUILD_TYPE = "64BIT" ]
+    then
+        cd ./build/wine-64
+        sudo make install > ../install64.log
+    elif [ $BUILD_TYPE = "WOW64" ]
+    then
+        cd ./build/wine-32
+        sudo make install > ../install32.log
         cd ../wine-64
         sudo make install > ../install64.log
     fi
     cd ../../
-
 }
 
 # install prerequisits
