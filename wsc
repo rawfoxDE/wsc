@@ -19,11 +19,11 @@ fRED="\033[1;7;33m"
  RES="\033[0m"
  VER="v0.1-19112019"
 
-# Build setup -----------------------------------------------
+# Build default setup ---------------------------------------
 INSTALL_PREFIX="/usr/local"
 BUILD_TYPE="WOW64"
 # number of cores to compile on
-THREADS="-j16"
+THREADS="16"
 # default build arguments
 ARGS_32="" #--without-gtk3 --without-freetype"
 ARGS_64="--enable-win64"
@@ -36,19 +36,19 @@ _SETARGS()
     clear
 
     echo -en "$BLU Current build options                                  $RES\n"
-    echo -en "$GRN Staging patches setup:$RES\n"
+    echo -en "$fRED Staging patches setup:                                 $RES\n"
     echo -en "$STG_ARGS\n"
-    echo -en "$GRN 32bit build setup:$RES\n"
+    echo -en "$fRED 32bit build setup:                                     $RES\n"
     echo -en "$ARGS_32\n"
-    echo -en "$GRN 64bit build setup:$RES\n"
+    echo -en "$fRED 64bit build setup:                                     $RES\n"
     echo -en "$ARGS_64\n"
-    echo -en "$GRN Threads to compile on: $RES\n"
+    echo -en "$fRED Threads to compile on:                                 $RES\n"
     echo -en "$THREADS\n"
-    echo -en "$GRN Current source path: $RES\n"
+    echo -en "$fRED Current source path:                                   $RES\n"
     echo -en "$PWD\n"
-    echo -en "$GRN Wine Installation Prefix: $RES\n"
+    echo -en "$fRED Wine Installation Prefix:                              $RES\n"
     echo -en "$INSTALL_PREFIX\n"
-    echo -en "$GRN Wine build type: $RES\n"
+    echo -en "$fRED Wine build type:                                       $RES\n"
     echo -en "$BUILD_TYPE\n"
 
     echo -en "$BLU Change or hit ENTER to return                          $RES\n\n"
@@ -57,9 +57,12 @@ _SETARGS()
     echo -en "$RED 2 $RES - Change 32-bit build options\n"
     echo -en "$RED 3 $RES - Change 64-bit build options\n"
     echo -en "$fBLU 4 $RES - Change threads to build on\n"
-    echo -en "$fRED 5 $RES - Change Wine build typ\n"
-    echo -en "$fRED 6 $RES - Change installation prefix\n\n==> "
-    
+    echo -en "$GRN 5 $RES - Change Wine build typ\n"
+    echo -en "$GRN 6 $RES - Change installation prefix\n\n"
+
+    echo -en "$BLU ------------------------------------------------------ $RES\n"
+    echo -en "$YLW ==> $RES  "
+
     read Z
     case $Z in
 
@@ -67,57 +70,44 @@ _SETARGS()
             echo -en "Current Staging options:\n $STG_ARGS\n"
             echo -en "Enter new options:\n"
             read STG
-            if [ $STG = "q" ]; then _DONE
-            else
             STG_ARGS=$STG
-            fi
         ;;
 
         [2]* )
 
             echo -en "Current 32-Bit build options:\n $ARGS_32\n"
             echo -en "Enter new options:\n"
-
             read TT
-            if [ $TT = "q" ]; then _DONE
-            else
             ARGS_32=$TT
-           fi
         ;;
 
         [3]* )
 
             echo -en "Current 64-Bit build options:\n $ARGS_64\n"
             echo -en "Enter new options:\n"
-
             read TF
-            if [ $TF = "q" ]; then _DONE
-            else
             ARGS_64=$TF
-            fi
         ;;
 
         [4]* )
 
             echo -en "Current threads to build on:\n $THREADS\n"
             echo -en "Enter new options:\n"
-
             read TH
-            if [ $TH = "q" ]; then _DONE
-            else 
             THREADS=$TH
-            fi
         ;;
 
         [5]* )
 
             clear
-            echo -en "$BLU Change the arch typ of the wine build          $RES\n\n"
-            echo -en "Default setup is a wow64 biarch wine build installed in /usr/local\n\n"
+            echo -en "$BLU Change the arch typ of the wine build                  $RES\n\n"
 
             echo -en "$RED 1 $RES - Set build $GRN BiArch $RES wow64 wine\n"
-            echo -en "$RED 2 $RES - Set build $GRN 32-Bit $RES only wine \n"
-            echo -en "$RED 3 $RES - Set build $GRN 64-Bit $RES only wine \n\n==> "
+            echo -en "$RED 2 $RES - Set build $GRN 32-Bit $RES wine \n"
+            echo -en "$RED 3 $RES - Set build $GRN 64-Bit $RES wine \n\n"
+
+            echo -en "$BLU ------------------------------------------------------ $RES\n"
+            echo -en "$YLW ==> $RES  "
 
             read BT
             case $BT in
@@ -138,12 +128,8 @@ _SETARGS()
 
             echo -en "Change installation prefix path\n"
             echo -en "Enter new prefix:\n"
-
             read IP
-            if [ $IP = "q" ]; then _DONE
-            else 
             INSTALL_PREFIX=$IP
-            fi
         ;;
 
     esac
@@ -166,8 +152,12 @@ _NEWBUILD()
     clear
 
     echo -en $YLW "Building Wine                                          $RES\n"
-    echo -en "Build Typ: $BUILD_TYPE \n"
-    echo -en "Install path : $INSTALL_PREFIX \n"
+    echo -en "Build Typ ..........: $BUILD_TYPE \n"
+    echo -en "Threads to build on : $THREADS \n"
+    echo -en "Staging args .......: $STG_ARGS \n"
+    echo -en "32-Bit args ........: $ARGS_32 \n"
+    echo -en "64-Bit args ........: $ARGS_64 \n"
+    echo -en "Install path .......: $INSTALL_PREFIX \n"
     echo -en $YLW "Building Wine                                          $RES\n"
 
     # clean the build directory
@@ -180,7 +170,7 @@ _NEWBUILD()
         echo -en "$BLU configure 32bit part, please wait ...                  $RES\n"
         ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_32 > ../configure32.log
         echo -en "$GRN compiling 32bit part now, please wait ...              $RES\n"
-        make $THREADS > ../compile32.log
+        make -j$THREADS &> ../compile32.log
         cd ../../
 
     elif [ $BUILD_TYPE = "64BIT" ]
@@ -190,7 +180,7 @@ _NEWBUILD()
         echo -en "$BLU configure 64bit part, please wait                      $RES\n"
         ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
         echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-        make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
+        make -j$THREADS &> ../compile64.log # overheat protection for amd8150 in summer :)
         cd ../../
 
     elif [ $BUILD_TYPE = "WOW64" ]
@@ -202,13 +192,13 @@ _NEWBUILD()
         echo -en "$BLU configure 64bit part, please wait                      $RES\n"
         ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
         echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-        make $THREADS > ../compile64.log # overheat protection for amd8150 in summer :)
+        make -j$THREADS &> ../compile64.log # overheat protection for amd8150 in summer :)
 
         cd ../wine-32
         echo -en "$BLU configure 32bit part, please wait                      $RES\n"
         PKG_CONFIG_PATH=/usr/lib/pkgconfig ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" --with-wine64=../wine-64 $ARGS_32 > ../configure32.log
         echo -en "$GRN compiling 32bit part now, please wait  ...             $RES\n"
-        make $THREADS > ../compile32.log
+        make -j$THREADS &> ../compile32.log
         cd ../../
     fi
 
