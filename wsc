@@ -75,7 +75,7 @@ _SETARGS()
 
         [2]* )
 
-            echo -en "Current 32-Bit build options:\n $STG_ARGS\n"
+            echo -en "Current 32-Bit build options:\n $ARGS_32\n"
             echo -en "Enter new options:\n"
 
             read TT
@@ -87,7 +87,7 @@ _SETARGS()
 
         [3]* )
 
-            echo -en "Current 64-Bit build options:\n $STG_ARGS\n"
+            echo -en "Current 64-Bit build options:\n $ARGS_64\n"
             echo -en "Enter new options:\n"
 
             read TF
