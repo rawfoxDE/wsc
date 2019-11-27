@@ -17,13 +17,13 @@ fBLU="\033[1;46m"
 fRED="\033[1;7;33m"
  YLW="\033[1;42m"
  RES="\033[0m"
- VER="v0.1-19112019"
+ VER="v0.2-27112019"
 
 # Build default setup ---------------------------------------
 INSTALL_PREFIX="/usr/local"
 BUILD_TYPE="WOW64"
-# number of cores to compile on
-THREADS="16"
+# number of cpu cores to compile on
+THREADS="4"
 # default build arguments
 ARGS_32="" #--without-gtk3 --without-freetype"
 ARGS_64="--enable-win64"
@@ -49,7 +49,7 @@ _SETARGS()
     echo -en "$fRED Wine Installation Prefix:                              $RES\n"
     echo -en "$INSTALL_PREFIX\n"
     echo -en "$fRED Wine build type:                                       $RES\n"
-    echo -en "$BUILD_TYPE\n"
+    echo -en "$BUILD_TYPE\n\n"
 
     echo -en "$BLU Change or hit ENTER to return                          $RES\n\n"
 
@@ -74,7 +74,6 @@ _SETARGS()
         ;;
 
         [2]* )
-
             echo -en "Current 32-Bit build options:\n $ARGS_32\n"
             echo -en "Enter new options:\n"
             read TT
@@ -82,7 +81,6 @@ _SETARGS()
         ;;
 
         [3]* )
-
             echo -en "Current 64-Bit build options:\n $ARGS_64\n"
             echo -en "Enter new options:\n"
             read TF
@@ -90,7 +88,6 @@ _SETARGS()
         ;;
 
         [4]* )
-
             echo -en "Current threads to build on:\n $THREADS\n"
             echo -en "Enter new options:\n"
             read TH
@@ -98,7 +95,6 @@ _SETARGS()
         ;;
 
         [5]* )
-
             clear
             echo -en "$BLU Change the arch typ of the wine build                  $RES\n\n"
 
@@ -125,7 +121,6 @@ _SETARGS()
         ;;
 
         [6]* )
-
             echo -en "Change installation prefix path\n"
             echo -en "Enter new prefix:\n"
             read IP
@@ -208,19 +203,20 @@ _NEWBUILD()
 # it will just do a make install on both builds, the 32bit and the 64bit
 _INSTALL()
 {
-    echo -en "$BLU Installing wine, please wait                           $RES\n"
-
     if [ $BUILD_TYPE = "32BIT" ]
     then
         cd ./build/wine-32
+        echo -en "$BLU Installing wine, please wait ...                       $RES\n"
         make install > ../install32.log
     elif [ $BUILD_TYPE = "64BIT" ]
     then
         cd ./build/wine-64
+        echo -en "$BLU Installing wine, please wait ...                       $RES\n"
         make install > ../install64.log
     elif [ $BUILD_TYPE = "WOW64" ]
     then
         cd ./build/wine-32
+        echo -en "$BLU Installing wine, please wait ...                       $RES\n"
         make install > ../install32.log
         cd ../wine-64
         make install > ../install64.log
@@ -229,19 +225,23 @@ _INSTALL()
 }
 _SUDO_INSTALL()
 {
-    echo -en "$BLU Installing wine, please wait                           $RES\n"
-
+    echo -en "$BLU Enter your sudo password:                              $RES\n"
     if [ $BUILD_TYPE = "32BIT" ]
     then
         cd ./build/wine-32
+        sudo echo -en "$BLU Installing wine, please wait ...                       $RES\n"
         sudo make install > ../install32.log
+
     elif [ $BUILD_TYPE = "64BIT" ]
     then
         cd ./build/wine-64
+        sudo echo -en "$BLU Installing wine, please wait ...                       $RES\n"
         sudo make install > ../install64.log
+
     elif [ $BUILD_TYPE = "WOW64" ]
     then
         cd ./build/wine-32
+        sudo echo -en "$BLU Installing wine, please wait ...                       $RES\n"
         sudo make install > ../install32.log
         cd ../wine-64
         sudo make install > ../install64.log
@@ -271,6 +271,8 @@ _RELEASE()
     read Y
     if [ $Y = "q" ]; then _DONE
     else
+
+  echo -en "\n$YLW Downloading wine-$Y, please wait ...              $RES\n"
 
     rm -rf ./wine-vanilla
     rm -rf ./wine-staging
@@ -375,7 +377,6 @@ case $X in
 
 # Set the building options
 [3]* )
-
     _SETARGS
 
 ;;
@@ -383,7 +384,7 @@ case $X in
 # System wine version check
 [v]* )
     clear
-    echo -en $BLU "check installed wine version ...                       $RES\n"
+    echo -en $BLU "Check installed wine version ...                       $RES\n"
     echo -en $GRN " "
     wine --version
     echo -en $RES
@@ -394,7 +395,7 @@ case $X in
 # for example to exclude a patchset
 [j]* )
     clear
-    echo -en $RED "prepareing source and injecting --all patches !!!      $RES\n"
+    echo -en $RED "Prepareing source and injecting --all patches !!!      $RES\n"
     cd ./workdir/
     ln -s "../wine-staging/patches"
     ./patches/patchinstall.sh $STG_ARGS
@@ -403,13 +404,11 @@ case $X in
 
 # Build the ./workdir source with the choosen options
 [B]* )
-
     _NEWBUILD
 ;;
 
 # Fedora related
 [Q]* )
-
     _PRE-INSTALL
 
 ;;
@@ -425,18 +424,18 @@ case $X in
 
 [9]* )
     clear
-    echo -en $fRED "Deleting the old staging source tree              $RES\n"
+    echo -en $fRED "Deleting the old staging source tree                  $RES\n"
     rm -rf ./wine-staging
-    echo -en $fRED "Getting a new copy of the wine-staging source     $RES\n"
+    echo -en $fRED "Getting a new copy of the wine-staging source         $RES\n"
     git clone https://github.com/wine-staging/wine-staging.git ./wine-staging
 
 ;;
 
 [0]* )
     clear
-    echo -en $fRED "Deleting the old wine source tree                 $RES\n"
+    echo -en $fRED "Deleting the old wine source tree                     $RES\n"
     rm -rf ./wine-vanilla
-    echo -en $fRED "Getting a new copy of the wine source             $RES\n"
+    echo -en $fRED "Getting a new copy of the wine source                 $RES\n"
     git clone git://source.winehq.org/git/wine.git ./wine-vanilla
 
 ;;
@@ -463,7 +462,7 @@ case $X in
 
 [c]* )
     clear
-    echo -en $fRED "Stash the changes and reset wine source to latest  $RES \n" 
+    echo -en $fRED "Stash the changes and reset wine source to latest      $RES \n" 
     cd ./workdir
     git stash
     git pull
@@ -504,7 +503,6 @@ case $X in
 ;;
 
 [P]* )
-
     _PBUILD
 
 ;;
