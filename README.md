@@ -43,51 +43,65 @@ Command overview:
 Build setup
 --
 - Here you can see and change the different options for your wine build.
+
 Check Wine Staging
 --
 - Connects to the wine-staging github and executes 'git pull' in the wine-staging donload dir.
+
 Check Wine Vanilla
 --
 - Connects to the wine github and makes a 'git pull' in the wine vanilla download dir.
+
 Check installed Wine version
 --
 - Executes 'wine --version' to quick check the installed wine version
+
 INJECT STAGING
 --
 - Before the wine-staging patches can be injected into the workdir, you need to copy the vanilla source to workdir with 'k'.
 After that you need to get the current version from wine staging into a hashtag ('a') and set the vanilla wine source to the wine-staging version ('b').
+
 COMPILE WORKDIR
 --
 - Builds your patched or modified wine in workdir
+
 Get current wine-staging SHA1
 --
 - This command will get the hash tag from the current wine-staging version.
+
 Rebase wine source to wine-staging Hash
 --
 - This will modify the sources in workdir to the current version of the wine-staging patchset.
 You need to do this in order to get the wine.staging patches to apply.
+
 Stash your changes and reset WORKDIR to vanilla wine
 --
 - This will reset the workdir source back to the current vanilla version
+
 Install Prerequisits
 --
 - Fist hack to install the 32bit prerequisits on your system, in case you miss some.
+
 Get a new Wine Staging source
 --
 - This just downloads a new wine-staging patchset from Github
+
 Get a new Vanilla wine source
 --
 Get a new Vanilla source from the wine Github.
 This goes not into workdir, its going into Vanilla dir so you can build vanilla anytime.
 Workdir is the place for the modified/patched Vanilla build.
+
 Get a certain wine-release version
 --
 - Lets you enter a wine release version of your choice, what is available in the main wine release repo. 
 It will download and unpack to wine-vanilla and wine-staging dir's so to unite them, need to copy to workdir first (k).
 No need to tweak the wine source to the wine-staging source because its a release version.
+
 Reset the source to SHA1
 --
 - Resets the source in ./workdir to a given hash tag.
+
 Apply my Patches
 --
 - Applies patches from ./patches dir to workdir.
@@ -97,6 +111,7 @@ Use a custom install path
 --
 - Changes the installation path to a custom location within the users rights.
 It does not install as superuser.
+
 INSTALL
 --
 - Install your build default to /usr/local/* .
