@@ -11,45 +11,45 @@
 
 # eye candy, practice on ANSI escape sequencies xD
  RED="\033[1;41m"
+dRED="\033[1;33m"
  BLU="\033[44m"
  GRN="\033[1;43m"
 fBLU="\033[1;46m"
 fRED="\033[1;7;33m"
  YLW="\033[1;42m"
  RES="\033[0m"
- VER="v0.2-27112019"
+ VER="v0.2-25122019"
 
 # Build default setup ---------------------------------------
 INSTALL_PREFIX="/usr/local"
 BUILD_TYPE="WOW64"
 # number of cpu cores to compile on
-THREADS="4"
+THREADS="16"
 # default build arguments
 ARGS_32="" #--without-gtk3 --without-freetype"
 ARGS_64="--enable-win64"
 # define wich default staging patchsets should be in- / excluded
-STG_ARGS="--all"
+STG_ARGS="--all" #-W user32-rawinput"
 # Functions -------------------------------------------------
 
 _SETARGS()
 {
     clear
-
     echo -en "$BLU Current build options                                  $RES\n"
-    echo -en "$fRED Staging patches setup:                                 $RES\n"
+    echo -en "$RED Staging patches setup:                                 $RES\n"
     echo -en "$STG_ARGS\n"
-    echo -en "$fRED 32bit build setup:                                     $RES\n"
+    echo -en "$RED 32bit build setup:                                     $RES\n"
     echo -en "$ARGS_32\n"
-    echo -en "$fRED 64bit build setup:                                     $RES\n"
+    echo -en "$RED 64bit build setup:                                     $RES\n"
     echo -en "$ARGS_64\n"
-    echo -en "$fRED Threads to compile on:                                 $RES\n"
+    echo -en "$fBLU Threads to compile on:                                 $RES\n"
     echo -en "$THREADS\n"
-    echo -en "$fRED Current source path:                                   $RES\n"
+    echo -en "$fRED Current wine source path:                              $RES\n"
     echo -en "$PWD\n"
-    echo -en "$fRED Wine Installation Prefix:                              $RES\n"
-    echo -en "$INSTALL_PREFIX\n"
-    echo -en "$fRED Wine build type:                                       $RES\n"
-    echo -en "$BUILD_TYPE\n\n"
+    echo -en "$GRN Wine build type:                                       $RES\n"
+    echo -en "$BUILD_TYPE\n"
+    echo -en "$GRN Wine Installation Prefix:                              $RES\n"
+    echo -en "$INSTALL_PREFIX\n\n"
 
     echo -en "$BLU Change or hit ENTER to return                          $RES\n\n"
 
@@ -72,28 +72,24 @@ _SETARGS()
             read STG
             STG_ARGS=$STG
         ;;
-
         [2]* )
             echo -en "Current 32-Bit build options:\n $ARGS_32\n"
             echo -en "Enter new options:\n"
             read TT
             ARGS_32=$TT
         ;;
-
         [3]* )
             echo -en "Current 64-Bit build options:\n $ARGS_64\n"
             echo -en "Enter new options:\n"
             read TF
             ARGS_64=$TF
         ;;
-
         [4]* )
             echo -en "Current threads to build on:\n $THREADS\n"
             echo -en "Enter new options:\n"
             read TH
             THREADS=$TH
         ;;
-
         [5]* )
             clear
             echo -en "$BLU Change the arch typ of the wine build                  $RES\n\n"
@@ -119,20 +115,16 @@ _SETARGS()
             ;;
             esac
         ;;
-
         [6]* )
             echo -en "Change installation prefix path\n"
             echo -en "Enter new prefix:\n"
             read IP
             INSTALL_PREFIX=$IP
         ;;
-
     esac
     clear
     echo -en "$RED New options are set !!!                                $RES\n"
     # End of while loop
-#    done
-
 }
 
 # _DONE is called, whenever an action is done
@@ -146,14 +138,14 @@ _NEWBUILD()
 {
     clear
 
-    echo -en $YLW "Building Wine                                          $RES\n"
+    echo -en $RED "Building Wine                                          $RES\n"
     echo -en "Build Typ ..........: $BUILD_TYPE \n"
     echo -en "Threads to build on : $THREADS \n"
     echo -en "Staging args .......: $STG_ARGS \n"
     echo -en "32-Bit args ........: $ARGS_32 \n"
     echo -en "64-Bit args ........: $ARGS_64 \n"
     echo -en "Install path .......: $INSTALL_PREFIX \n"
-    echo -en $YLW "Building Wine                                          $RES\n"
+    echo -en $RED "Building Wine                                          $RES\n"
 
     # clean the build directory
     rm -rf ./build/*
@@ -167,7 +159,6 @@ _NEWBUILD()
         echo -en "$GRN compiling 32bit part now, please wait ...              $RES\n"
         make -j$THREADS &> ../compile32.log
         cd ../../
-
     elif [ $BUILD_TYPE = "64BIT" ]
     then
         mkdir -p --mode=0777 ./build/wine-64
@@ -177,7 +168,6 @@ _NEWBUILD()
         echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
         make -j$THREADS &> ../compile64.log # overheat protection for amd8150 in summer :)
         cd ../../
-
     elif [ $BUILD_TYPE = "WOW64" ]
     then
         mkdir -p --mode=0777 ./build/wine-32
@@ -196,27 +186,25 @@ _NEWBUILD()
         make -j$THREADS &> ../compile32.log
         cd ../../
     fi
-
 }
 
-# _INSTALL is called when you select Install from menu
-# it will just do a make install on both builds, the 32bit and the 64bit
+# _INSTALL is called when you select INSTALL from menu
 _INSTALL()
 {
     if [ $BUILD_TYPE = "32BIT" ]
     then
         cd ./build/wine-32
-        echo -en "$BLU Installing wine, please wait ...                       $RES\n"
+        echo -en "$RED Installing wine, please wait ...                       $RES\n"
         make install > ../install32.log
     elif [ $BUILD_TYPE = "64BIT" ]
     then
         cd ./build/wine-64
-        echo -en "$BLU Installing wine, please wait ...                       $RES\n"
+        echo -en "$RED Installing wine, please wait ...                       $RES\n"
         make install > ../install64.log
     elif [ $BUILD_TYPE = "WOW64" ]
     then
         cd ./build/wine-32
-        echo -en "$BLU Installing wine, please wait ...                       $RES\n"
+        echo -en "$RED Installing wine, please wait ...                       $RES\n"
         make install > ../install32.log
         cd ../wine-64
         make install > ../install64.log
@@ -229,19 +217,19 @@ _SUDO_INSTALL()
     if [ $BUILD_TYPE = "32BIT" ]
     then
         cd ./build/wine-32
-        sudo echo -en "$BLU Installing wine, please wait ...                       $RES\n"
+        sudo echo -en "$RED Installing wine, please wait ...                       $RES\n"
         sudo make install > ../install32.log
 
     elif [ $BUILD_TYPE = "64BIT" ]
     then
         cd ./build/wine-64
-        sudo echo -en "$BLU Installing wine, please wait ...                       $RES\n"
+        sudo echo -en "$RED Installing wine, please wait ...                       $RES\n"
         sudo make install > ../install64.log
 
     elif [ $BUILD_TYPE = "WOW64" ]
     then
         cd ./build/wine-32
-        sudo echo -en "$BLU Installing wine, please wait ...                       $RES\n"
+        sudo echo -en "$RED Installing wine, please wait ...                       $RES\n"
         sudo make install > ../install32.log
         cd ../wine-64
         sudo make install > ../install64.log
@@ -250,9 +238,10 @@ _SUDO_INSTALL()
 }
 
 # install prerequisits
+# ignore this for now :p
 _PRE-INSTALL()
 {
-    echo -en "$BLU Installing / Checking Prerequisits ...                 $RES\n"
+    echo -en "$RED Installing / Checking Prerequisits ...                 $RES\n"
 
     sudo dnf install alsa-plugins-pulseaudio.i686 glibc-devel.i686 glibc-devel libgcc.i686 libX11-devel.i686 freetype-devel.i686 libXcursor-devel.i686 libXi-devel.i686 libNX_Xext-devel.i686 libXext-devel.i686 libXxf86vm-devel.i686 libXrandr-devel.i686 libXinerama-devel.i686 mesa-libGLU-devel.i686 mesa-libOSMesa-devel.i686 libXrender-devel.i686 libpcap-devel.i686 ncurses-devel.i686 libzip-devel.i686 lcms2-devel.i686 zlib-devel.i686 libv4l-devel.i686 libgphoto2-devel.i686 libcapifax-devel.i686  cups-devel.i686 libxml2-devel.i686 openldap-devel.i686 libxslt-devel.i686 gnutls-devel.i686 libpng-devel.i686 flac-libs.i686 json-c.i686 libICE.i686 libSM.i686 libXtst.i686 libasyncns.i686 libedit.i686 liberation-narrow-fonts.noarch libieee1284.i686 libogg.i686 libsndfile.i686 libuuid.i686 libva.i686 libvorbis.i686 libwayland-client.i686 libwayland-server.i686 llvm-libs.i686 mesa-dri-drivers.i686 mesa-filesystem.i686 mesa-libEGL.i686 mesa-libgbm.i686 nss-mdns.i686 ocl-icd.i686 pulseaudio-libs.i686 python-talloc.x86_64 sane-backends-libs.i686 tcp_wrappers-libs.i686 unixODBC.i686 samba-common-tools.x86_64 samba-libs.x86_64 samba-winbind.x86_64 samba-winbind-clients.x86_64 samba-winbind-modules.x86_64 mesa-libGL-devel.i686 fontconfig-devel.i686 libXcomposite-devel.i686 libtiff-devel.i686 openal-soft-devel.i686 mesa-libOpenCL-devel.i686 opencl-utils-devel.i686 alsa-lib-devel.i686 gsm-devel.i686 libjpeg-turbo-devel.i686 pulseaudio-libs-devel.i686 pulseaudio-libs-devel gtk3-devel.i686 libattr-devel.i686 libva-devel.i686 libexif-devel.i686 libexif.i686 glib2-devel.i686 mpg123-devel.i686 mpg123-devel.x86_64 libcom_err-devel.i686 libcom_err-devel.x86_64 gstreamer-plugins-base-devel gstreamer-devel.i686 gstreamer.i686 gstreamer-plugins-base.i686 gstreamer-devel gstreamer1.i686 gstreamer1-devel gstreamer1-plugins-base-devel.i686 gstreamer-plugins-base.x86_64 gstreamer.x86_64 gstreamer1-devel.i686 gstreamer1-plugins-base-devel gstreamer-plugins-base-devel.i686 gstreamer-ffmpeg.i686 gstreamer1-plugins-bad-free-devel.i686 gstreamer1-plugins-bad-free-extras.i686 gstreamer1-plugins-good-extras.i686 gstreamer1-libav.i686 gstreamer1-plugins-bad-freeworld.i686
 
@@ -272,7 +261,7 @@ _RELEASE()
     if [ $Y = "q" ]; then _DONE
     else
 
-  echo -en "\n$YLW Downloading wine-$Y, please wait ...              $RES\n"
+  echo -en "\n$dRED Downloading wine-$Y, please wait ...              $RES\n"
 
     rm -rf ./wine-vanilla
     rm -rf ./wine-staging
@@ -315,6 +304,25 @@ _REBASE()
 
 }
 
+_REBASE_STAG()
+{
+    clear
+    echo -en "$BLU Rebase staging source ...                             $RES\n"
+    echo -en "$GRN Enter SHA1 to reset wine staging to                   $RES\n
+
+    $YLW ==> $RES "
+
+    read Z
+    if [ $Z = "q" ]; then _DONE
+    else
+    cd wine-staging
+    git reset --hard $Z
+    cd ..
+    fi
+
+}
+
+
 # Script Main Input loop
 #####################################################################################
 clear
@@ -335,6 +343,7 @@ $RED a $RES - Get current wine-staging SHA1
 $RED b $RES - Rebase wine source to the wine-staging Hash
 $RED c $RES - Stash changes and reset source to vanilla wine
 $RED R $RES - Rebase workdir source to SHA1
+$RED S $RES - Rebase wine-staging source to SHA1
 
 $RED B $RES - BUILD WINE
 $RED i $RES - INSTALL                  $RED q $RES - Quit
@@ -474,17 +483,24 @@ case $X in
     clear
     echo -en $fRED "Patching Sources ...                                   $RES \n" 
     cd ./workdir
-    x=1
-    for (( c=1; c<=x; c++ ))
-    do
-        if [ ! -f ../patches/*$x*.patch ]; 
-        then echo -en "$BLU NO MORE PATCHES $RES \n"
-        else
-        echo -en "$BLU ------> Patch number $x $RES \n"
-        patch -p1 < ../patches/*$x*.patch
-        x=$((x+1))
-        fi
+
+    for file in $(ls ../patches/*.patch); do
+    echo -en "$BLU ------> Patch number $file $RES \n"
+    patch -l -p1 <../patches/$file
     done
+    echo -en "$BLU NO MORE PATCHES $RES \n"
+
+#    x=1
+#    for (( c=1; c<=x; c++ ))
+#    do
+#        if [ ! -f ../patches/*$x*.patch ]; 
+#        then echo -en "$BLU NO MORE PATCHES $RES \n"
+#        else
+#        echo -en "$BLU ------> Patch number $x $RES \n"
+#        patch -p1 < ../patches/*$x*.patch
+#        x=$((x+1))
+#        fi
+#    done
 
     cd ..
 ;;
@@ -496,7 +512,7 @@ case $X in
 
 [k]* )
     clear
-    echo -en $fRED "Restore Workdir from Wine Vanilla ...                  $RES \n"
+    echo -en $RED "Restore Workdir from Wine Vanilla ...                  $RES \n"
     rm -rf ./workdir
     cp -rf ./wine-vanilla ./workdir
 
@@ -511,6 +527,12 @@ case $X in
     _REBASE
 
 ;;
+
+[S]* )
+    _REBASE_STAG
+
+;;
+
 
 esac
 
