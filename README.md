@@ -1,3 +1,5 @@
+![alt text](https://i.imgur.com/kmWNyCp.png)
+
 # wsc
 wine source control
 --
@@ -149,5 +151,4 @@ k -> a -> b -> j -> B -> I
 
 Again, look into the script, visit the compiler calls and modify to your needs !
 
-![alt text](https://i.imgur.com/kmWNyCp.png)
 
