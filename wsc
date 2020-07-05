@@ -18,19 +18,38 @@ fBLU="\033[1;46m"
 fRED="\033[1;7;33m"
  YLW="\033[1;42m"
  RES="\033[0m"
- VER="v0.2-25122019"
+ VER="v0.3-02072020"
 
-# Build default setup ---------------------------------------
+# Build default setup
+# ====================================================================
 INSTALL_PREFIX="/usr/local"
 BUILD_TYPE="WOW64"
+
 # number of cpu cores to compile on
-THREADS="16"
+if [[ "$THREADS" == "" ]]; then
+    cores=$(grep processor /proc/cpuinfo | wc -l)
+    THREADS="$(($cores))"
+fi
+
 # default build arguments
-ARGS_32="" #--without-gtk3 --without-freetype"
+ARGS_32=""
 ARGS_64="--enable-win64"
+
 # define wich default staging patchsets should be in- / excluded
-STG_ARGS="--all" #-W user32-rawinput"
-# Functions -------------------------------------------------
+STG_ARGS="--all" # -W user32-rawinput"
+
+# Build Lutris runner setup
+# ====================================================================
+# name your runner
+wine_version=rawtest
+# container tool podman or docker
+CONTOOL="podman"
+# Dockerfile to use Ubuntu18 or Ubuntu19 as runner build base
+DockerfileVER=18
+
+#----------------------------------
+# Functions
+# ---------------------------------
 
 _SETARGS()
 {
@@ -60,6 +79,7 @@ _SETARGS()
     echo -en "$GRN 5 $RES - Change Wine build typ\n"
     echo -en "$GRN 6 $RES - Change installation prefix\n\n"
 
+    echo -en "$RED q $RES - Back to Menu\n\n"
     echo -en "$BLU ------------------------------------------------------ $RES\n"
     echo -en "$YLW ==> $RES  "
 
@@ -121,6 +141,7 @@ _SETARGS()
             read IP
             INSTALL_PREFIX=$IP
         ;;
+
     esac
     clear
     echo -en "$RED New options are set !!!                                $RES\n"
@@ -137,7 +158,6 @@ _DONE()
 _NEWBUILD()
 {
     clear
-
     echo -en $RED "Building Wine                                          $RES\n"
     echo -en "Build Typ ..........: $BUILD_TYPE \n"
     echo -en "Threads to build on : $THREADS \n"
@@ -166,7 +186,7 @@ _NEWBUILD()
         echo -en "$BLU configure 64bit part, please wait                      $RES\n"
         ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
         echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-        make -j$THREADS &> ../compile64.log # overheat protection for amd8150 in summer :)
+        make -j$THREADS &> ../compile64.log # overheat protection
         cd ../../
     elif [ $BUILD_TYPE = "WOW64" ]
     then
@@ -177,7 +197,7 @@ _NEWBUILD()
         echo -en "$BLU configure 64bit part, please wait                      $RES\n"
         ../../workdir/configure --prefix=$INSTALL_PREFIX CC="ccache gcc" CFLAGS="-march=native -O3 -pipe -fstack-protector-strong" $ARGS_64 > ../configure64.log
         echo -en "$GRN compiling 64bit part now, please wait ...              $RES\n"
-        make -j$THREADS &> ../compile64.log # overheat protection for amd8150 in summer :)
+        make -j$THREADS &> ../compile64.log # overheat protection
 
         cd ../wine-32
         echo -en "$BLU configure 32bit part, please wait                      $RES\n"
@@ -322,6 +342,256 @@ _REBASE_STAG()
 
 }
 
+_CONTAINER()
+{
+    clear
+    #while [ "$C" != "q" ]
+    #do
+    echo -en "$BLU Lutris runner build setup                              $RES\n\n"
+    echo -en "$RED B $RES - Build Lutris Runner \n\n"
+    echo -en "$dRED S $RES - Setup a new podman / docker environment\n"
+    echo -en "$dRED I $RES - Info on available containers / images \n\n"
+    echo -en "$RED q $RES - Back to Menu\n\n"
+    echo -en "$BLU ==> $RES "
+
+    read C
+    case $C in
+
+    [B]* )
+        clear
+        mkdir -p build/{data64,data32,wine-source}
+        mkdir -p build/{data64,data32}/{wine-cfg,build,ccache}
+
+        if [[ "$http_proxy" = "" ]]; then
+            git config --global http.proxy $http_proxy
+        fi
+
+        echo "Clearing previous"
+        rm -rf ./build/wine-source/
+        rm -rf ./build/data64/{build,wine-cfg}
+        rm -rf ./build/data32/{build,wine-cfg,wine-tools}
+
+        mkdir ./build/wine-source
+        mkdir ./build/data64/{build,wine-cfg}
+        mkdir ./build/data32/{build,wine-cfg,wine-tools}
+
+        cp -rf ./workdir/* ./build/wine-source
+
+        echo "Wine source ready for build"
+        echo -en "$GRN Building the runner now, please wait ...                   $RES\n"
+
+        rm -rf "./build/lutris-runner-${wine_version}"
+
+        mkdir "./build/lutris-runner-${wine_version}"
+
+        find "./build/data32/ccache" -size 0 -delete
+        find "./build/data64/ccache" -size 0 -delete
+
+        $CONTOOL run --rm -t -v ./build:/build --env build_cores=$THREADS --name wine-builder64 wine-builder64:latest ./build64.sh $wine_version > ./build/podbuild64.log
+        $CONTOOL run --rm -t -v ./build:/build --name wine-builder64 wine-builder64:latest chown -R $UID:$UID /build/
+        $CONTOOL run --rm -t -v ./build:/build --name wine-builder64 wine-builder64:latest chmod -R 0777 /build/
+
+        $CONTOOL run --rm -t -v ./build:/build --env build_cores=$THREADS --name wine-builder32 wine-builder32:latest ./build32.sh $wine_version > ./build/podbuild32.log
+        $CONTOOL run --rm -t -v ./build:/build --name wine-builder32 wine-builder32:latest chown -R $UID:$UID /build/
+        $CONTOOL run --rm -t -v ./build:/build --name wine-builder32 wine-builder32:latest chmod -R 0777 /build/
+
+    ;;
+
+    [I]* )
+
+        echo -en "$BLU Available podman containers / images                   $RES\n\n"
+        $CONTOOL image list
+        echo -en "\n"
+
+    ;;
+
+    [S]* )
+        _PODMAN_SETUP
+    ;;
+    esac
+}
+
+Dockerfile64_19()
+{
+echo "FROM ubuntu:19.10 AS BUILD64
+ENV build_cores 10
+ARG http_proxy
+ENV http_proxy=\${http_proxy}
+ENV https_proxy=\${http_proxy}
+
+RUN sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install git ccache -y \
+    && dpkg --add-architecture i386 \
+    && apt-get build-dep wine -y \
+    && apt-get build-dep wine-development -y \
+    && /usr/sbin/update-ccache-symlinks
+
+COPY ./scripts/build64.sh build64.sh
+
+RUN chmod +x build64.sh
+
+RUN mkdir /build
+
+VOLUME [ "/build" ]
+" > ./Dockerfile.64bit
+}
+
+Dockerfile32_19()
+{
+echo -en "FROM i386/ubuntu:19.10 AS BUILD32
+ENV build_cores 10
+ARG http_proxy
+ENV http_proxy=\${http_proxy}
+ENV https_proxy=\${http_proxy}
+
+RUN sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install git ccache -y \
+    && apt-get build-dep wine -y \
+    && apt-get build-dep wine-development -y \
+    && /usr/sbin/update-ccache-symlinks
+
+COPY ./scripts/build32.sh build32.sh
+
+RUN chmod +x build32.sh
+
+RUN mkdir /build
+
+VOLUME [ "/build" ]
+" > ./Dockerfile.32bit
+}
+
+Dockerfile64_18()
+{
+echo "FROM ubuntu:18.04 AS BUILD64
+ENV build_cores 16
+ARG http_proxy
+ENV http_proxy=\${http_proxy}
+ENV https_proxy=\${http_proxy}
+
+RUN sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install git ccache libvulkan-dev -y \
+    && dpkg --add-architecture i386 \
+    && apt-get build-dep wine -y \
+    && apt-get build-dep wine-development -y \
+    && /usr/sbin/update-ccache-symlinks
+
+COPY scripts/build64.sh build64.sh
+
+RUN chmod +x build64.sh
+
+RUN mkdir /build
+
+VOLUME [ "/build" ]
+" > ./Dockerfile.64bit
+}
+
+Dockerfile32_18()
+{
+echo -en "FROM i386/ubuntu:18.04 AS BUILD32
+ENV build_cores 16
+ARG http_proxy
+ENV http_proxy=\${http_proxy}
+ENV https_proxy=\${http_proxy}
+
+RUN sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install git ccache libvulkan-dev:i386 -y \
+    && apt-get build-dep wine -y \
+    && apt-get build-dep wine-development -y \
+    && /usr/sbin/update-ccache-symlinks
+
+COPY scripts/build32.sh build32.sh
+
+RUN chmod +x build32.sh
+
+RUN mkdir /build
+
+VOLUME [ "/build" ]
+" > ./Dockerfile.32bit
+}
+
+Buildfile64()
+{
+echo "#!/bin/bash
+
+set -e
+
+export PATH="./ccache:\$PATH"
+
+ccache -F 0 && ccache -M 0
+ccache --set-config=cache_dir=/build/data64/ccache
+
+cd /build/data64/wine-cfg
+/build/wine-source/configure --enable-win64 --prefix=/build/data64/build
+
+make -j16 install
+
+" > ./scripts/build64.sh
+chmod 0777 ./scripts/build64.sh
+
+}
+
+Buildfile32()
+{
+echo -en "#!/bin/bash
+
+set -e
+export PATH="./ccache:\$PATH"
+
+ccache -F 0 && ccache -M 0
+ccache --set-config=cache_dir=/build/data32/ccache
+
+cd /build/data32/wine-tools
+/build/wine-source/configure  --prefix=/build/data32/build/
+
+make -j16 install
+
+cd /build/data32/wine-cfg
+/build/wine-source/configure --with-wine64=/build/data64/build/ --with-wine-tools=/build/data32/wine-tools --prefix=/build/data32/build/
+
+make -j16 install
+
+cp -r -f /build/data32/build/* /build/lutris-runner-${wine_version}
+cp -r -f /build/data64/build/* /build/lutris-runner-${wine_version}
+
+" > ./scripts/build32.sh
+chmod 0777 ./scripts/build32.sh
+
+}
+
+_PODMAN_SETUP()
+{
+    echo -en "$fRED Creating the podman build system ...                   $RES\n"
+    echo -en "$fRED This will need some time ...                           $RES\n"
+
+    if [[ "$http_proxy" != "" ]]; then
+        echo "Proxy set, creating build_args to use it"
+        export build_args="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$http_proxy"
+    fi
+
+    mkdir ./scripts
+    Buildfile64
+    Buildfile32
+
+    Dockerfile64_$DockerfileVER
+    Dockerfile32_$DockerfileVER
+
+    echo "Building 64bit Ubuntu Wine builder"
+    podman build --pull --rm --tag wine-builder64:latest $build_args -f Dockerfile.64bit .
+
+    echo "Building 32bit Ubuntu Wine builder"
+    podman build --pull --rm --tag wine-builder32:latest $build_args -f Dockerfile.32bit .
+
+if [[ "$do_prune" == "yes" ]]; then
+    echo "Clearing up any intermediates"
+    podman image prune -f
+fi
+
+}
+
 
 # Script Main Input loop
 #####################################################################################
@@ -345,9 +615,9 @@ $RED c $RES - Stash changes and reset source to vanilla wine
 $RED R $RES - Rebase workdir source to SHA1
 $RED S $RES - Rebase wine-staging source to SHA1
 
-$RED B $RES - BUILD WINE
-$RED i $RES - INSTALL                  $RED q $RES - Quit
-$RED I $RES - SUDO INSTALL
+$RED B $RES - BUILD WINE               $RED C $RES - BUILD RUNNER
+$RED i $RES - INSTALL
+$RED I $RES - SUDO INSTALL             $RED q $RES - Quit
 
 $RED v $RES - Check installed Wine
 $RED 9 $RES - Get a new Wine Staging source
@@ -414,6 +684,10 @@ case $X in
 # Build the ./workdir source with the choosen options
 [B]* )
     _NEWBUILD
+;;
+
+[C]* )
+    _CONTAINER
 ;;
 
 # Fedora related
@@ -489,18 +763,6 @@ case $X in
     patch -l -p1 <../patches/$file
     done
     echo -en "$BLU NO MORE PATCHES $RES \n"
-
-#    x=1
-#    for (( c=1; c<=x; c++ ))
-#    do
-#        if [ ! -f ../patches/*$x*.patch ]; 
-#        then echo -en "$BLU NO MORE PATCHES $RES \n"
-#        else
-#        echo -en "$BLU ------> Patch number $x $RES \n"
-#        patch -p1 < ../patches/*$x*.patch
-#        x=$((x+1))
-#        fi
-#    done
 
     cd ..
 ;;

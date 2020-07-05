@@ -1,3 +1,7 @@
+0.3-02072020
+Added the ability, to build a wine runner for Lutris from the locally modified sources in ./workdir .
+
+
 0.2-25122019
 Polishing
 Added rebase function for staging patches
