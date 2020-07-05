@@ -61,12 +61,12 @@ Check installed Wine version
 --
 - Executes 'wine --version' to quick check the installed wine version
 
-INJECT STAGING
+Inject Staging
 --
 - Before the wine-staging patches can be injected into the workdir, you need to copy the vanilla source to workdir with 'k'.
 After that you need to get the current version from wine staging into a hashtag ('a') and set the vanilla wine source to the wine-staging version ('b').
 
-COMPILE WORKDIR
+Compile Workdir
 --
 - Builds your patched or modified wine in workdir
 
@@ -117,10 +117,14 @@ Use a custom install path
 - Changes the installation path to a custom location within the users rights.
 It does not install as superuser.
 
-INSTALL
+Install
 --
 - Install your build default to /usr/local/* .
 This is different from the most distribution packages as they went into /usr/* .
+
+Build Runner
+--
+- Here you can setup your machine to build wine in a container to use with Lutris.
 
 Very first look into the script!
 
