@@ -10,7 +10,7 @@ This bash script will download the needed files and is able to build Wine in dif
 Usage
 --
 Clone wsc from git and symlink wsc to your $PATH, for example /usr/local/bin/wsc, so you can just join a empty directory 
-and call the script. Else the wsc script must be present in the directory you want to build wine in.
+and call the script.
 
 Concept:
 --
@@ -24,6 +24,7 @@ Actually i needed a tool to
 - build a modified local source
 - patch the source with own patches
 - prepare a source and inject staging
+- create a Lutris runner
 - ...
 
 The directories created by wsc are:
@@ -92,7 +93,7 @@ Get a new Wine Staging source
 
 Get a new Vanilla wine source
 --
-Get a new Vanilla source from the wine Github.
+- Get a new Vanilla source from the wine Github.
 This goes not into workdir, its going into Vanilla dir so you can build vanilla anytime.
 Workdir is the place for the modified/patched Vanilla build.
 
@@ -142,11 +143,9 @@ If you want other install targets, you want to review the build settings (press 
 
 To build a current wine-staging, you want rebase the vanilla sources to the actual wine staging version.
 
-k -> a -> b -> j -> B -> I
+k -> j -> B -> I
 
 (press 'k') to copy the Vanilla source to workdir.
-(press 'a') to get the actual wine-staging hash tag.
-(press 'b') to base/set the wine vanilla sources to the wine-staging hash version.
 (press 'j') to inject the wine-staging patches.
 (press 'B') to build wine staging.
 (press 'I') to install wine-staging.
