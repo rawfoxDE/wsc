@@ -1,6 +1,10 @@
+0.3-06072020
+Added selection for the buildbase on Ubuntu 18 or 19
+Rename the runner output
+Polishing the workflow
+
 0.3-02072020
 Added the ability, to build a wine runner for Lutris from the locally modified sources in ./workdir .
-
 
 0.2-25122019
 Polishing
