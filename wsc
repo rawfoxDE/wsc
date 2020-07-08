@@ -18,7 +18,7 @@ fBLU="\033[1;46m"
 fRED="\033[1;7;33m"
  YLW="\033[1;42m"
  RES="\033[0m"
- VER="v0.3-05072020"
+ VER="v0.3-06072020"
 
 # Build default setup
 # ====================================================================
@@ -41,11 +41,11 @@ STG_ARGS="--all" # -W user32-rawinput"
 # Build Lutris runner setup
 # ====================================================================
 # name your runner
-wine_version=rawtest
+wine_version="LUG-wine-HEAD"
 # container tool podman or docker
 CONTOOL="podman"
 # Dockerfile to use Ubuntu18 or Ubuntu19 as runner build base
-DockerfileVER=18
+DockerfileVER="18"
 
 #----------------------------------
 # Functions
@@ -281,7 +281,7 @@ _RELEASE()
     if [ $Y = "q" ]; then _DONE
     else
 
-  echo -en "\n$dRED Downloading wine-$Y, please wait ...              $RES\n"
+    echo -en "\n$dRED Downloading wine-$Y, please wait ...              $RES\n"
 
     rm -rf ./wine-vanilla
     rm -rf ./wine-staging
@@ -349,6 +349,9 @@ _CONTAINER()
     #do
     echo -en "$BLU Lutris runner build setup                              $RES\n\n"
     echo -en "$RED B $RES - Build Lutris Runner \n\n"
+
+    echo -en "$dRED V $RES - Set build version, current:$dRED Ubuntu$DockerfileVER $RES\n"
+    echo -en "$dRED N $RES - Rename the runner, current:$dRED $wine_version        $RES\n"
     echo -en "$dRED S $RES - Setup a new podman / docker environment\n"
     echo -en "$dRED I $RES - Info on available containers / images \n\n"
     echo -en "$RED q $RES - Back to Menu\n\n"
@@ -366,7 +369,8 @@ _CONTAINER()
             git config --global http.proxy $http_proxy
         fi
 
-        echo "Clearing previous"
+        echo -en "$RED Building the Wine runner                               $RES\n"
+        echo -en "$fRED Clearing previous ...                                  $RES\n"
         rm -rf ./build/wine-source/
         rm -rf ./build/data64/{build,wine-cfg}
         rm -rf ./build/data32/{build,wine-cfg,wine-tools}
@@ -377,12 +381,19 @@ _CONTAINER()
 
         cp -rf ./workdir/* ./build/wine-source
 
-        echo "Wine source ready for build"
-        echo -en "$GRN Building the runner now, please wait ...                   $RES\n"
+        echo -en "$fRED Wine source ready for build ...                        $RES\n"
+        echo -en "Buildtyp ...........: $BUILD_TYPE \n"
+        echo -en "Buildbase ..........: Ubuntu $DockerfileVER \n"
+        echo -en "Runner Name ........: $wine_version \n"
+        echo -en "Threads to build on : $THREADS \n"
+        echo -en "Staging args .......: $STG_ARGS \n"
+        echo -en "32-Bit args ........: $ARGS_32 \n"
+        echo -en "64-Bit args ........: $ARGS_64 \n"
+        echo -en "$RED Building the runner now, please wait ...               $RES\n"
 
-        rm -rf "./build/lutris-runner-${wine_version}"
+        rm -rf "./build/${wine_version}"
 
-        mkdir "./build/lutris-runner-${wine_version}"
+        mkdir "./build/${wine_version}"
 
         find "./build/data32/ccache" -size 0 -delete
         find "./build/data64/ccache" -size 0 -delete
@@ -394,6 +405,9 @@ _CONTAINER()
         $CONTOOL run --rm -t -v ./build:/build --env build_cores=$THREADS --name wine-builder32 wine-builder32:latest ./build32.sh $wine_version > ./build/podbuild32.log
         $CONTOOL run --rm -t -v ./build:/build --name wine-builder32 wine-builder32:latest chown -R $UID:$UID /build/
         $CONTOOL run --rm -t -v ./build:/build --name wine-builder32 wine-builder32:latest chmod -R 0777 /build/
+
+        cp -r -f ./build/data32/build/* ./build/${wine_version}
+        cp -r -f ./build/data64/build/* ./build/${wine_version}
 
     ;;
 
@@ -407,8 +421,47 @@ _CONTAINER()
 
     [S]* )
         _PODMAN_SETUP
+
     ;;
+
+    [V]* )
+
+        echo -en "$BLU Set Dockerfile to use ...                              $RES\n\n"
+
+        echo -en "$RED 1 $RES - Set $dRED Ubuntu 18.04$RES as buildbase for the runner\n"
+        echo -en "$RED 2 $RES - Set $dRED Ubuntu 19.10$RES as buildbase for the runner\n\n"
+        echo -en "$RED q $RES - Back to Menu\n\n"
+        echo -en "$BLU ==> $RES "
+
+        read V
+        case $V in
+
+        [1]* )
+               DockerfileVER="18"
+        ;;
+
+        [2]* )
+               DockerfileVER="19"
+        ;;
+        esac
+
+    ;;
+
+    [N]* )
+
+        echo -en "$BLU Rename the runner ...                                   $RES\n\n"
+        echo -en "$YLW ==> $RES "
+
+        read Y
+        if [ $Y = "q" ]; then _DONE
+        else 
+        wine_version="$Y"
+        fi
+
+    ;;
+
     esac
+
 }
 
 Dockerfile64_19()
@@ -554,9 +607,6 @@ cd /build/data32/wine-cfg
 
 make -j16 install
 
-cp -r -f /build/data32/build/* /build/lutris-runner-${wine_version}
-cp -r -f /build/data64/build/* /build/lutris-runner-${wine_version}
-
 " > ./scripts/build32.sh
 chmod 0777 ./scripts/build32.sh
 
@@ -580,18 +630,17 @@ _PODMAN_SETUP()
     Dockerfile32_$DockerfileVER
 
     echo "Building 64bit Ubuntu Wine builder"
-    podman build --pull --rm --tag wine-builder64:latest $build_args -f Dockerfile.64bit .
+    $CONTOOL build --pull --rm --tag wine-builder64:latest $build_args -f Dockerfile.64bit .
 
     echo "Building 32bit Ubuntu Wine builder"
-    podman build --pull --rm --tag wine-builder32:latest $build_args -f Dockerfile.32bit .
+    $CONTOOL build --pull --rm --tag wine-builder32:latest $build_args -f Dockerfile.32bit .
 
 if [[ "$do_prune" == "yes" ]]; then
     echo "Clearing up any intermediates"
-    podman image prune -f
+    $CONTOOL image prune -f
 fi
 
 }
-
 
 # Script Main Input loop
 #####################################################################################
@@ -759,7 +808,7 @@ case $X in
     cd ./workdir
 
     for file in $(ls ../patches/*.patch); do
-    echo -en "$BLU ------> Patch number $file $RES \n"
+    echo -en "$BLU ------> Patch $file $RES \n"
     patch -l -p1 <../patches/$file
     done
     echo -en "$BLU NO MORE PATCHES $RES \n"
@@ -794,7 +843,6 @@ case $X in
     _REBASE_STAG
 
 ;;
-
 
 esac
 
