@@ -9,13 +9,22 @@ This bash script will download the needed files and is able to build Wine in dif
 
 Usage
 --
-Clone wsc from git and symlink wsc to your $PATH, for example /usr/local/bin/wsc, so you can just join a empty directory 
+Clone wsc from git and symlink wsc to your $PATH, for example /usr/local/bin/wsc, so you can just join a empty directory
 and call the script.
 
 Concept:
 --
-The incredible modularity of the wine sources give a lot of options to reach a good working wine core that can serve all the 
+The incredible modularity of the wine sources give a lot of options to reach a good working wine core that can serve all the
 certain prefixes for your best gaming experience with Windows games on Linux, using wine.
+
+The concept in wsc is to offer a quick way to modify the wine source in a variable directory, a so called "workdir".
+In that dir, you can patch, edit and kebab your wine source, without the need to redownload it every time,
+so if things went south, you can just recopy it by pressing 'k' from the menu and quick patch it again with a couple keys to press,
+rather then retype hell.
+
+Once your source is prepared, you can direct the build into any output path in any configuration you want.
+You can also use the prepared wine source, to create a more compatible wine runner to use for a wider audience,
+build in podman or docker containers, offering Ubuntu 18 and 19 as buildbase for now
 
 Actually i needed a tool to
 - download vanilla and staging
@@ -24,7 +33,7 @@ Actually i needed a tool to
 - build a modified local source
 - patch the source with own patches
 - prepare a source and inject staging
-- create a Lutris runner
+- create and manage a Lutris runner
 - ...
 
 The directories created by wsc are:
@@ -38,7 +47,14 @@ The directories created by wsc are:
 - ./cache         - contains version downloads from getting a wine release
 
 Dirs created by you:
+
 - ./patches       - a place for your patches
+
+Dirs created by the podman / docker setup:
+
+- ,/build/data32        - the 32bit container build folder
+- ./build/data64        - the 64bit container build folder
+- ./build/wine-source   - the wine source from ./workdir to use for the container build
 
 Usage:
 
@@ -126,8 +142,9 @@ Build Runner
 --
 - Here you can setup your machine to build wine in a container to use with Lutris.
 
-Very first look into the script!
 
+Very first look into the script!
+In the header you find the most variables to set as base for your needs.
 Check what the single functions do, this script is just a tool to reduce the typing in the console ^^
 
 Create a directory in what you gonna work with wsc.
@@ -156,4 +173,8 @@ k -> j -> B -> I
 
 Again, look into the script, visit the compiler calls and modify to your needs !
 
-
+Credits
+--
+- Credits go to Simon Natella, who has build a wine runner builder (https://github.com/snatella/wine-runner-sc)
+for Linux Users Group at StarCitizen. He was helping me a ton with the container build ability.
+Thanks you @molotov_sh ^^
