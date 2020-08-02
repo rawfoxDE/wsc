@@ -1,3 +1,7 @@
+0.3-29072020
+Added automatic podman / docker detection for the container builds
+Added a function to exclude a certain commit from the source by SHA1
+
 0.3-06072020
 Added selection for the buildbase on Ubuntu 18 or 19
 Rename the runner output
