@@ -18,7 +18,7 @@ fBLU="\033[1;46m"
 fRED="\033[1;7;33m"
  YLW="\033[1;42m"
  RES="\033[0m"
- VER="v0.3-06072020"
+ VER="v0.3-29072020"
 
 # Build default setup
 # ====================================================================
@@ -43,7 +43,11 @@ STG_ARGS="--all" # -W user32-rawinput"
 # name your runner
 wine_version="LUG-wine-HEAD"
 # container tool podman or docker
-CONTOOL="podman"
+#CONTOOL="podman"
+if hash docker 2>/dev/null; then CONTOOL="docker"
+else CONTOOL="podman"
+fi
+
 # Dockerfile to use Ubuntu18 or Ubuntu19 as runner build base
 DockerfileVER="18"
 
@@ -306,6 +310,25 @@ _RELEASE()
 
 }
 
+_RV_COMMIT()
+{
+    clear
+    echo -en "$BLU Revert a commit from workdir ...                      $RES\n"
+    echo -en "$GRN Enter SHA1 of the commit to revert ...                $RES\n
+
+    $YLW ==> $RES "
+
+    read R
+    if [ $R = "q" ]; then _DONE
+    else
+    cd workdir
+    git revert $R
+    git rebase -i
+    cd ..
+    fi
+
+}
+
 _REBASE()
 {
     clear
@@ -348,7 +371,7 @@ _CONTAINER()
     #while [ "$C" != "q" ]
     #do
     echo -en "$BLU Lutris runner build setup                              $RES\n\n"
-    echo -en "$RED B $RES - Build Lutris Runner \n\n"
+    echo -en "$dRED B $RES - Build Lutris Runner with $GRN $CONTOOL $RES \n\n"
 
     echo -en "$dRED V $RES - Set build version, current:$dRED Ubuntu$DockerfileVER $RES\n"
     echo -en "$dRED N $RES - Rename the runner, current:$dRED $wine_version        $RES\n"
@@ -663,6 +686,7 @@ $RED b $RES - Rebase wine source to the wine-staging Hash
 $RED c $RES - Stash changes and reset source to vanilla wine
 $RED R $RES - Rebase workdir source to SHA1
 $RED S $RES - Rebase wine-staging source to SHA1
+$RED X $RES - Revert a certain commit SHA1 from workdir
 
 $RED B $RES - BUILD WINE               $RED C $RES - BUILD RUNNER
 $RED i $RES - INSTALL
@@ -841,6 +865,11 @@ case $X in
 
 [S]* )
     _REBASE_STAG
+
+;;
+
+[X]* )
+    _RV_COMMIT
 
 ;;
 
