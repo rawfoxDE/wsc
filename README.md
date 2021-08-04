@@ -79,8 +79,7 @@ Check installed Wine version
 
 Inject Staging
 --
-- Before the wine-staging patches can be injected into the workdir, you need to copy the vanilla source to workdir with 'k'.
-After that you need to get the current version from wine staging into a hashtag ('a') and set the vanilla wine source to the wine-staging version ('b').
+- Press 'k' to copy the wine vanilla sources to workdir, then press 'j' to inject the wine-staging patches into the wine sources.
 
 Compile Workdir
 --
